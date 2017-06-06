@@ -22,44 +22,45 @@ In this section we will create the basic iOS iPhone application skeleton needed 
 
 In this section we set up the Cocoapod dependency manager and add Realm's Swift bindings and a utility module that allows us to create a multi-user application using a preconfigured login panel
 
-1. Quit Xcode
-2. Open a Terminal window and change to the directory/folder where you created the Xcode _RealmTasksTutorial_ project
-2. If you have not already done so, install the [Cocoapods system](https://cocoapods.org/)
+ 1. Quit Xcode
+ 2. Open a Terminal window and change to the directory/folder where you created the Xcode _RealmTasksTutorial_ project
+ 2. If you have not already done so, install the [Cocoapods system](https://cocoapods.org/)
 	 - Full details are available via the Cocopods site, but the simplest instructions are to type ``sudo gem install cocoapods`` in a terminal window
-3. Initialize a new Cocoapods Podfile with ```pod init```  A new file called `Podfile` will be created.
-4. Edit the Podfile find the the comment line that reads:
+ 3. Initialize a new Cocoapods Podfile with ```pod init```  A new file called `Podfile` will be created.
+ 4. Edit the Podfile find the the comment line that reads:
 
  ` # Pods for MultiUserRealmTasksTutorial`
 
-And add the following:
+	And add the following:
 
 ```ruby
 pod 'RealmSwift'
 pod 'RealmLoginKit'
 ```
 
-5. Save the file
-6. At the terminal, type `pod install` - this will cause the Cocoapods system to fetch the RealmSwift and RealmLoginKit modules, as well as create a new Xcode workspace file which enabled these modules to be used in this project.
+ 5. Save the file
+ 6. At the terminal, type `pod install` - this will cause the Cocoapods system to fetch the RealmSwift and RealmLoginKit modules, as well as create a new Xcode workspace file which enabled these modules to be used in this project.
 
 
 ## 3. Setting Up the Storyboard & Views
 
 In this section we will set up our login and main view controller's storyboard connections.
 
-	1. Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use the newly created `MultiUserRealmTasksTutorial.xcworkspace` file; this was created by the Cocoapods dependency manager and should be used going forward
+1. Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use the newly created `MultiUserRealmTasksTutorial.xcworkspace` file; this was created by the Cocoapods dependency manager and should be used going forward
 
-  2. If you have not already, open the `MultiUserRealmTasksTutorial.xcworkspace` with Xcode.
+2. If you have not already, open the `MultiUserRealmTasksTutorial.xcworkspace` with Xcode.
 
-  3. In the Xcode project navigator select the `main.storyboard` file. The Interface builder (IB) will open and show the default single view layout:
+3. In the Xcode project navigator select the `main.storyboard` file. Interface builder (IB) will open and show the default single view layout:
 
 	<center><img src="/Graphics/InterfaceBuilder-start.png"> 	</center>
 
-  3.  Adding the TableViewController - on the lower right of the window is the object browser, type "tableview" to narrow down the possible IB objects. There will be a "TableView Controller" object visible. Drag this onto the canvas. Once you have done this the Storyboard view will resemble this:
+3. Adding the TableViewController - on the lower right of the window is the object browser, type "tableview" to narrow down the possible IB objects. There will be a "TableView Controller" object visible. Drag this onto the canvas. Once you have done this the Storyboard view will resemble this:
 
 	<center> <img src="/Graphics/Adding-theTableViewController.png" /></center>
 
 
 Once you have added the second view controller, you will need to connect the two controllers by a pair of segues, as well as add class names/storyboard IDs for each controller to prepare for the code will be adding in the next sections:
+
 1. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears. Select the segue that is created between the two controllers, and set the name of ther segue in the property view on the right side to "loginToTasksViewSegue"
 
 2. Do the same from the `TasksLoginViewController` back to the `TasksLoginViewController`.  Here, again, tap the newly created segue (it will be the diagonal line) and name this segue "tasksViewToLoginControllerSegue"

@@ -62,9 +62,9 @@ In this section we will set up our login and main view controller's storyboard c
 Once you have added the second view controller, you will need to connect the two controllers by a pair of segues, as well as add class names/storyboard IDs for each controller to prepare for the code will be adding in the next sections:
 1. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears. Select the segue that is created between the two controllers, and set the name of ther segue in the property view on the right side to "loginToTasksViewSegue"
 
-2. Do the same from the TasksLoginViewController back to the Login View Controller.  Here again tap the newly created segue (it will be the diagonal line) and name this segue "tasksViewToLoginControllerSegue"
+2. Do the same from the `TasksLoginViewController` back to the `TasksLoginViewController`.  Here, again, tap the newly created segue (it will be the diagonal line) and name this segue "tasksViewToLoginControllerSegue"
 
-3. You willnedd to set the class names for each of the view controller objects. To so this select the contrllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the TableViewController you added, set the class name to `TasksTableViewController` and here set the  storyboard id to `tasksView`. A video summary of these tasks can be seen here:
+3. You will need to set the class names for each of the view controller objects. To do this select the controllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the new TableViewController you added, set the class name to `TasksTableViewController` and here set the storyboard id to `tasksView`. A video summary of these tasks can be seen here:
 
 
 
@@ -76,21 +76,16 @@ The final configfuration will look like this:
 <center> <img src="/Graphics/final-storyboard-config.png" /></center>
 
 
-## 3. Creating the Login View Controller
+## 3. Configuring the Login View Controller
 
-In this section we will create a new view controller that will allow you to log in an existing user account, or create a new account
-
-
+In this section we will rename and then configure the TasksLoginViewController that will allow you to log in an existing user account, or create a new account
 
 
   1. Open the  `view controller` file in the project naivator. Click once on it to enable editing of the file name; change the name to `TasksLoginViewController` and press return to rename the file.
-  2. Clicking on the filename shlud also have opned the newly renamed file in the editor. Here too you should replace all references to   `ViewController` in the comments and class name with `TasksLoginViewController`
-  3. Also on the "General" tab, enter an organization name and select a team name (you may need to log in to your Apple developer account via Xcode's Preferences/Account pane)
-4. Switch to the "Capabilities" tab and turn on the "Keychain Sharing" switch.
+  2. Clicking on the filename should also have opened the newly renamed file in the editor. Here too you should replace all references to `ViewController` in the comments and class name with `TasksLoginViewController`
+  3. Next, we are going to update the contents of this view controller and take it from a generic, empty controller to one that can display our Login Panel.
 
-Next, we are going to updat ehte contents ofthis vciew cohtroller and take it from a generic empty controller to one that can display our Login Panel.
-
-Start by modifying the imports to read as follows:
+  4. Start by modifying the imports to read as follows:
 
 
 ```swift
@@ -101,7 +96,7 @@ import RealmLoginKit
 
 
 
-Now replace the contents of `AppDelegate.swift` with the following:
+  5. Modify the top of the class file so the following properties are declared:
 
 ```swift
 class TasksLoginViewController: UITableViewController {
@@ -109,27 +104,122 @@ class TasksLoginViewController: UITableViewController {
 	var token: NotificationToken!
 	var myIdentity = SyncUser.current?.identity!
 	var thePersonRecord: Person?
-
 }
 ```
 
+  6. Next, modify the empty `viewWillAppear` method to
+
+```swift
+	override func viewDidAppear(_ animated: Bool) {
+			loginViewController = LoginViewController(style: .lightOpaque)
+
+			loginViewController.isServerURLFieldHidden = true // the user doesn't need to see the server IP in production.
+			loginViewController.isRegistering = true
+			loginViewController.copyrightLabelText = ""
+
+			if (SyncUser.current != nil) {
+					// yup - we've got a stored session, so just go right to the UITabView
+					Realm.Configuration.defaultConfiguration = ConstandsAndModels.commonRealmConfig
+					performSegue(withIdentifier: ConstandsAndModels.kLoginToMainView, sender: self)
+			} else {
+					// show the RealmLoginKit controller
+					//loginViewController = LoginViewController(style: .lightOpaque)
+					if loginViewController!.serverURL == nil {
+							loginViewController!.serverURL = ConstandsAndModels.syncAuthURL.absoluteString
+					}
+					// Set a closure that will be called on successful login
+					loginViewController.loginSuccessfulHandler = { user in
+							DispatchQueue.main.async {
+
+									Realm.asyncOpen(configuration: ConstandsAndModels.commonRealmConfig) { realm, error in
+											if let realm = realm {
+													Realm.Configuration.defaultConfiguration = BingoConstants.commonRealmConfig
+													self.thePersonRecord = Person.createProfile()   // let's make this person a local profile in /~/BingoPrivate
+																																					// then dismiss the login view, and...
+													self.loginViewController!.dismiss(animated: true, completion: nil)
+
+													// Do a little stats gathering...
+													self.logUser()
+
+													// hop right into the main view for the app (this will be set up by the positioning of the tabs in either app
+													self.performSegue(withIdentifier: ConstandsAndModels.kLoginToMainView, sender: nil)
+
+											} else if let error = error {
+												print("An error occirred on login: \(error.description)")
+													Alertift.alert(title:NSLocalizedString( "Unable to login...", comment:  "Unable to login..."), message: NSLocalizedString("Code: \(error) - please try later", comment: "Code: \(error) - please try later"))
+															.action(.cancel("Cancel"))
+															.show()
+											}
+									} // of asyncOpen()
+
+							} // of main queue dispatch
+					}// of login controller
+
+					present(loginViewController, animated: true, completion: nil)
+			}
+	}
+	```
 
 Optionally, commit your progress in source control.
 
 Your app should now build and run---although so far it doesn't do much, it will show you to login panel you just configured.
+
+Click the stop button to temrinate the app, and we will continue with the rest of the changes needed to create our Realm Tasks app.
 
 
 <center> <img src="/Graphics/TaskLoginView.png" /></center>
 
 
 ## 4. XCreate the Models and Constants Class File
-In this step we are going to create a few constants to help us manage our Realm as well as the class models our Realm will operate on
+In this step we are going to create a few constants to help us manage our Realm as well as the class models our Realm will operate on.
 
-From the Project Navgfator, right click and select `New File` and when the file selector appreat select `Swift File` and name the file `ConstandAndModels` and press preturn.  Xcode will create a new Swift file and open it in the editor.
+From the Project Navigator, right click and select `New File` and when the file selector apprears select `Swift File` and name the file `ConstantsAndModels` and press preturn.  Xcode will create a new Swift file and open it in the editor.
 
-Our first task will be to create our Task models; to do this add the following code to the file.
+Our first task will be to create some contants that will make opeing and working with Realms easier, then we will define the Task models.  o do this add the following code to the f
+
+
+Let's start with the Contants; add the following  to the file:
+
 ```swift
+import Foundation
 import RealmSwift
+
+struct Constants {
+    // segue names
+    static let      kLoginToMainView                = "loginToMainViewSegue"
+    static let      kExitToLoginViewSegue           = "segueToLogin"
+
+
+    // the host tht will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1
+    // if you are using the Professional or Enterprise Editions, then this will be a host on the Internet
+    static let defaultSyncHost                      = "127.0.0.1"
+
+    // this is purely for talking to the RMP auth system
+    static let syncAuthURL                          = URL(string: "http://\(defaultSyncHost):9080")!
+
+    // The following URLs and URI fragments are about talking to the synchronization service and the Realms
+    // it manages on behalf of your application:
+    static let syncServerURL                        = URL(string: "realm://\(defaultSyncHost):9080/")
+
+    // Note: When we say Realm file we mean literally the entire collection of models/schemas inside that Realm...
+    // So we need to be very clear what models that are represented by a given Realm.  For example:
+
+    // this is a realm where we can store profile info - not covered in the main line of this tutorial
+    static let commonRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/CommonRealm")!
+    static let commonRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: commonRealmURL),objectTypes: [Person.self])
+
+    //  this is a task Realm comptible with the fully version of RealmTasks for iOS/Android/C#
+    static let tasksRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/Tasks")!
+    static let tasksRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: tasksRealmURL),objectTypes: [TaskList.self, Task.self])
+
+}
+
+```
+
+Next, we'll add the definitions of our models.  Note that there are two kinds of models here: 1) the Task and taskList modes, and 2) a "Person" model.  This last model will allow us to store some meta data (first andm last name) about users of the app. It will be used only by this demo application and is instantiated in such a way the it can cleanly interoperate with other versions of the app that are not multi-user aware.
+
+
+```swift
 
 // MARK: Model
 

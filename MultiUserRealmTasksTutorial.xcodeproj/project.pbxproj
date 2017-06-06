@@ -15,6 +15,7 @@
 		8B0CEB3B1EE72E51004B11FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B0CEB391EE72E51004B11FF /* LaunchScreen.storyboard */; };
 		8B0CEB461EE72E51004B11FF /* MultiUserRealmTasksTutorialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0CEB451EE72E51004B11FF /* MultiUserRealmTasksTutorialTests.swift */; };
 		8B0CEB511EE72E51004B11FF /* MultiUserRealmTasksTutorialUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0CEB501EE72E51004B11FF /* MultiUserRealmTasksTutorialUITests.swift */; };
+		8B8AF4111EE75CCE00C264A8 /* ConstantsAndModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8AF4101EE75CCE00C264A8 /* ConstantsAndModels.swift */; };
 		934FC14AE81EAC33BF1B55B5 /* Pods_MultiUserRealmTasksTutorialTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87C4DA13416B86CD3C1FA720 /* Pods_MultiUserRealmTasksTutorialTests.framework */; };
 		9F2B2B4ED5561F59539D724F /* Pods_MultiUserRealmTasksTutorial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64323A397D113AEC86E7B7C6 /* Pods_MultiUserRealmTasksTutorial.framework */; };
 /* End PBXBuildFile section */
@@ -54,6 +55,7 @@
 		8B0CEB4C1EE72E51004B11FF /* MultiUserRealmTasksTutorialUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MultiUserRealmTasksTutorialUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B0CEB501EE72E51004B11FF /* MultiUserRealmTasksTutorialUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiUserRealmTasksTutorialUITests.swift; sourceTree = "<group>"; };
 		8B0CEB521EE72E51004B11FF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B8AF4101EE75CCE00C264A8 /* ConstantsAndModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsAndModels.swift; sourceTree = "<group>"; };
 		9E4C2EB85D2EC3AED81FBE76 /* Pods-MultiUserRealmTasksTutorial.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MultiUserRealmTasksTutorial.release.xcconfig"; path = "Pods/Target Support Files/Pods-MultiUserRealmTasksTutorial/Pods-MultiUserRealmTasksTutorial.release.xcconfig"; sourceTree = "<group>"; };
 		AC23564422415BCE680B2097 /* Pods-MultiUserRealmTasksTutorialTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MultiUserRealmTasksTutorialTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MultiUserRealmTasksTutorialTests/Pods-MultiUserRealmTasksTutorialTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CCF7870495347BEC846B2475 /* Pods-MultiUserRealmTasksTutorialUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MultiUserRealmTasksTutorialUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-MultiUserRealmTasksTutorialUITests/Pods-MultiUserRealmTasksTutorialUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 				8B0CEB371EE72E51004B11FF /* Assets.xcassets */,
 				8B0CEB391EE72E51004B11FF /* LaunchScreen.storyboard */,
 				8B0CEB3C1EE72E51004B11FF /* Info.plist */,
+				8B8AF4101EE75CCE00C264A8 /* ConstantsAndModels.swift */,
 			);
 			path = MultiUserRealmTasksTutorial;
 			sourceTree = "<group>";
@@ -450,6 +453,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B0CEB331EE72E51004B11FF /* LoginViewController.swift in Sources */,
+				8B8AF4111EE75CCE00C264A8 /* ConstantsAndModels.swift in Sources */,
 				8B0CEB311EE72E51004B11FF /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

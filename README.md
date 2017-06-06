@@ -44,76 +44,84 @@ pod 'RealmLoginKit'
 
 ## 3. Setting Up the Storyboard & Views
 In this section we will set up our login and main view controller's storyboard connections.
+  1. Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use the newly created `MultiUserRealmTasksTutorial.xcworkspace` file; this was created by the Cocoapods dependency manager and should be used going forward
 
-  1. If you have not already, open the `MultiUserRealmTasksTutorial.xcworkspace` with Xcode.
-  2. In the Xcode project navigator select the `main.storyboard` file. The Interface builder (IB) will open and show the default single view layout:
+  2. If you have not already, open the `MultiUserRealmTasksTutorial.xcworkspace` with Xcode.
 
-<img src="/Graphics/InterfaceBuilder-start.png">
+  3. In the Xcode project navigator select the `main.storyboard` file. The Interface builder (IB) will open and show the default single view layout:
+
+	<center><img src="/Graphics/InterfaceBuilder-start.png"> 	</center>
 
   3.  Adding the TableViewController - on the lower right of the window is the object browser, type "tableview" to narrow down the possible IB objects. There will be a "TableView Controller" object visible. Drag this onto the canvas. Once you have done this the Storyboard view will resemble this:
 
+	<center> <img src="/Graphics/Adding-theTableViewController.png" /></center>
 
-<center> <img src="/Graphics/Adding-theTableViewController.png" /></center>
+
+Once you have added the second view controller, you will need to connect the tywo controllers by a pair of segues,as well as add class names for each controller to prepare for the code will be adding in the next sections:
+
+		1. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears. Select the segue that is created between the two controllers, and set the name of ther segue in the property view on the right side to "loginToTasksViewSegue"
+
+		2. Do the same from the TasksLoginViewController back to the Login View Controller.  Here again tap the newly created segue (it will be the diagonal line) and name this segue "tasksViewToLoginControllerSegue"
+		3. You willnedd to set the class names for each of the view controller objects. To so this select the contrllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the TableViewController you added, set the class name to `TasksTableViewController` and here set the  storyboard id to `tasksView`
+
+	A summary of  these activities an be see in here:
+
+<center> <img src="/Graphics/MUTasks-StoryBoardSetup.gif" /></center>
+
 
   5.  Labelling the Storyboard Views
 
+	## 3. Creating the Login View Controller
+	In this section we will create a new view controller that will allow you to log in an existing user account, or create a new account
 
 
 
-## 4. Configuring the Login Controller
 
-1. Delete the `Main.storyboard` file from the Xcode project navigator, clicking "Move To Trash" when prompted.
-2. On the "General" tab of the `MultiUserRealmTasksTutorial` target editor, clear the "Main Interface" text field in the "Deployment Info" section.
-3. Also on the "General" tab, enter an organization name and select a team name (you may need to log in to your Apple developer account via Xcode's Preferences/Account pane)
+  1. Open the  `view controller` file in the project naivator. Click once on it to enable editing of the file name; change the name to `TasksLoginViewController` and press return to rename the file.
+  2. Clicking on the filename shlud also have opned the newly renamed file in the editor. Here too you should replace all references to   `ViewController` in the comments and class name with `TasksLoginViewController`
+  3. Also on the "General" tab, enter an organization name and select a team name (you may need to log in to your Apple developer account via Xcode's Preferences/Account pane)
 4. Switch to the "Capabilities" tab and turn on the "Keychain Sharing" switch.
 
-Delete the contents of the `ViewController.swift` file, replacing it with this:
+Next, we are going to updat ehte contents ofthis vciew cohtroller and take it from a generic empty controller to one that can display our Login Panel.
+
+Start by modifying the imports to read as follows:
+
 
 ```swift
 import UIKit
 import RealmSwift
 import RealmLoginKit
-
-class ViewController: UITableViewController {
-}
 ```
+
+
 
 Now replace the contents of `AppDelegate.swift` with the following:
 
 ```swift
-import UIKit
+class TasksLoginViewController: UITableViewController {
+	var loginViewController: LoginViewController!
+	var token: NotificationToken!
+	var myIdentity = SyncUser.current?.identity!
+	var thePersonRecord: Person?
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions:[UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = UINavigationController(rootViewController: ViewController(style: .plain))
-        window?.makeKeyAndVisible()
-        return true
-    }
 }
 ```
 
+
 Optionally, commit your progress in source control.
 
-Your app should now build and run---although so far, it will just show a blank screen.
+Your app should now build and run---although so far it doesn't do much, it will show you to login panel you just configured.
 
-## 3. Creating the Login View Controller
-In this section we will create a new view controller that will allow you to log in an existing user account, or create a new account
 
-  1. Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use the newly created `MultiUserRealmTasksTutorial.xcworkspace` file; this was created by the Cocoapods dependency manager and should be used going forward
+<center> <img src="/Graphics/TaskLoginView.png" /></center>
 
-## 4. Import Realm Swift and create models
 
-Download the latest release of the Realm Mobile Platform for macOS. Unzip the archive, then open the `SDKs/realm-cocoa_*.*.*` directory. Open `ios`, then the `swift-3.1` (if using Xcode 8.3.\*), `swift-3.0.1` (if using Xcode 8.1 or Xcode 8.2) or `swift-3.0` (if using Xcode 8.0.\*) directory.
+## 4. XCreate the Models and Constants Class File
+In this step we are going to create a few constants to help us manage our Realm as well as the class models our Realm will operate on
 
-Drag `Realm.framework` and `RealmSwift.framework` into the "Embedded Binaries" section of your `RealmTasksTutorial` target's "General" tab.
+From the Project Navgfator, right click and select `New File` and when the file selector appreat select `Swift File` and name the file `ConstandAndModels` and press preturn.  Xcode will create a new Swift file and open it in the editor.
 
-A confirmation dialog will appear, check "Copy Items if Needed" and click "Finish".
-
-Then, add the following at the top of `ViewController.swift` (adding the new `import` statement and code right under the existing `import UIKit`):
-
+Our first task will be to create our Task models; to do this add the following code to the file.
 ```swift
 import RealmSwift
 

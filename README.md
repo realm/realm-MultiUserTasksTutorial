@@ -2,12 +2,12 @@
 
 This tutorial will guide you through writing an iOS app using Realm Swift to sync with the RealmTasks demo apps.
 
-First, [install the MacOS bundle](get-started/installation/mac) if you haven't yet. This will get you set up with the Realm Mobile Platform and let you launch the macOS version of RealmTasks.
+First, [install the MacOS bundle](get-started/installation/mac) if you haven't yet. This will get you set up with the Realm Mobile Platform including a local copy of the Realm Object Server and let you launch the macOS version of RealmTasks.
 
 
 ## 1. Create a new Xcode project
 
-In this section we will create the basic iOS iPhone application skeleton  needed for this tutorial.
+In this section we will create the basic iOS iPhone application skeleton needed for this tutorial.
 
 1. Launch Xcode 8.
 2. Click "Create a new Xcode project".
@@ -43,8 +43,10 @@ pod 'RealmLoginKit'
 
 
 ## 3. Setting Up the Storyboard & Views
+
 In this section we will set up our login and main view controller's storyboard connections.
-  1. Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use the newly created `MultiUserRealmTasksTutorial.xcworkspace` file; this was created by the Cocoapods dependency manager and should be used going forward
+
+	1. Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use the newly created `MultiUserRealmTasksTutorial.xcworkspace` file; this was created by the Cocoapods dependency manager and should be used going forward
 
   2. If you have not already, open the `MultiUserRealmTasksTutorial.xcworkspace` with Xcode.
 
@@ -66,7 +68,13 @@ Once you have added the second view controller, you will need to connect the two
 
 
 
-<center> <img src="/Graphics/MUTasks-StoryBoardSetup.gif" /></center>
+<center> <img src="/Graphics/MUTasks-StoryBoardSetup.gif" /></center></br>
+
+
+The final configfuration will look like this:
+
+<center> <img src="/Graphics/final-storyboard-config.png" /></center>
+
 
 ## 3. Creating the Login View Controller
 

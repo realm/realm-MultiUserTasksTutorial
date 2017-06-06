@@ -57,22 +57,20 @@ In this section we will set up our login and main view controller's storyboard c
 	<center> <img src="/Graphics/Adding-theTableViewController.png" /></center>
 
 
-Once you have added the second view controller, you will need to connect the tywo controllers by a pair of segues,as well as add class names for each controller to prepare for the code will be adding in the next sections:
+Once you have added the second view controller, you will need to connect the two controllers by a pair of segues, as well as add class names/storyboard IDs for each controller to prepare for the code will be adding in the next sections:
+1. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears. Select the segue that is created between the two controllers, and set the name of ther segue in the property view on the right side to "loginToTasksViewSegue"
 
-		1. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears. Select the segue that is created between the two controllers, and set the name of ther segue in the property view on the right side to "loginToTasksViewSegue"
+2. Do the same from the TasksLoginViewController back to the Login View Controller.  Here again tap the newly created segue (it will be the diagonal line) and name this segue "tasksViewToLoginControllerSegue"
 
-		2. Do the same from the TasksLoginViewController back to the Login View Controller.  Here again tap the newly created segue (it will be the diagonal line) and name this segue "tasksViewToLoginControllerSegue"
-		3. You willnedd to set the class names for each of the view controller objects. To so this select the contrllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the TableViewController you added, set the class name to `TasksTableViewController` and here set the  storyboard id to `tasksView`
+3. You willnedd to set the class names for each of the view controller objects. To so this select the contrllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the TableViewController you added, set the class name to `TasksTableViewController` and here set the  storyboard id to `tasksView`. A video summary of these tasks can be seen here:
 
-	A summary of  these activities an be see in here:
+
 
 <center> <img src="/Graphics/MUTasks-StoryBoardSetup.gif" /></center>
 
+## 3. Creating the Login View Controller
 
-  5.  Labelling the Storyboard Views
-
-	## 3. Creating the Login View Controller
-	In this section we will create a new view controller that will allow you to log in an existing user account, or create a new account
+In this section we will create a new view controller that will allow you to log in an existing user account, or create a new account
 
 
 

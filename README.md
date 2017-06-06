@@ -239,13 +239,24 @@ final class Task: Object {
 }
 ```
 
-At this point, we've imported RealmSwift into the app and defined the data models (`Task` and `TaskList`) that we'll use to represent our data and sync with the RealmTasks apps.
+At this point, we've created a login system, and defined the data models (`Task` and `TaskList`) that we'll use to represent our data and sync with the RealmTasks apps.
 
 Your app should still build and run.
 
-## 4. Add a title and register a cell class for use with our table view
+## 5. The TaskList Controller: Add a title and register a cell class for use with our table view
 
-Add the following to the body of your `ViewController` class:
+In this section we will created and configure our TasksTableViewController.
+
+
+In the project navigator, right-click on the "MultiUserRealmTasksTutorial" group and select new file agin. This time you will select a "Cocoa Touch" class, then press "Next"  For the *class* section you want to enter `TasksTableViewController` whch is the name you entered when you created and configured the view contrlller in the storyboard; for *Subclass of* you want to enter UITableViewContgroller (typing the first few characters will cause Xcode to help with autocompletion suggestions).
+
+
+<center> <img src="/Graphics/Create-TaskTableViewController.png" /></center>
+
+The language should be set to "Swift. Clck "next" and save the file alond side the other files in this project.
+
+
+Xcode will open the file and we can now start configuring this view controller: class.
 
 ```swift
 override func viewDidLoad() {

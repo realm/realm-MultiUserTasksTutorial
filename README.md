@@ -113,10 +113,7 @@ class TasksLoginViewController: UITableViewController {
 ```swift
 	override func viewDidAppear(_ animated: Bool) {
 			loginViewController = LoginViewController(style: .lightOpaque)
-
-			loginViewController.isServerURLFieldHidden = true // the user doesn't need to see the server IP in production.
 			loginViewController.isRegistering = true
-			loginViewController.copyrightLabelText = ""
 
 			if (SyncUser.current != nil) {
 					// yup - we've got a stored session, so just go right to the UITabView
@@ -124,7 +121,6 @@ class TasksLoginViewController: UITableViewController {
 					performSegue(withIdentifier: ConstandsAndModels.kLoginToMainView, sender: self)
 			} else {
 					// show the RealmLoginKit controller
-					//loginViewController = LoginViewController(style: .lightOpaque)
 					if loginViewController!.serverURL == nil {
 							loginViewController!.serverURL = ConstandsAndModels.syncAuthURL.absoluteString
 					}
@@ -135,24 +131,17 @@ class TasksLoginViewController: UITableViewController {
 									Realm.asyncOpen(configuration: ConstandsAndModels.commonRealmConfig) { realm, error in
 											if let realm = realm {
 													Realm.Configuration.defaultConfiguration = BingoConstants.commonRealmConfig
-													self.thePersonRecord = Person.createProfile()   // let's make this person a local profile in /~/BingoPrivate
+													self.thePersonRecord = Person.createProfile()   // let's make this person a local profile in /CommonRealm
 																																					// then dismiss the login view, and...
 													self.loginViewController!.dismiss(animated: true, completion: nil)
 
-													// Do a little stats gathering...
-													self.logUser()
-
-													// hop right into the main view for the app (this will be set up by the positioning of the tabs in either app
+													// hop right into the main view for the app
 													self.performSegue(withIdentifier: ConstandsAndModels.kLoginToMainView, sender: nil)
 
 											} else if let error = error {
-												print("An error occirred on login: \(error.description)")
-													Alertift.alert(title:NSLocalizedString( "Unable to login...", comment:  "Unable to login..."), message: NSLocalizedString("Code: \(error) - please try later", comment: "Code: \(error) - please try later"))
-															.action(.cancel("Cancel"))
-															.show()
+												print("An error occurred on login: \(error.description)")
 											}
 									} // of asyncOpen()
-
 							} // of main queue dispatch
 					}// of login controller
 

@@ -11,7 +11,7 @@ import RealmSwift
 
 struct Constants {
     // segue names
-    static let      kLoginToMainView                = "loginToMainViewSegue"
+    static let      kLoginToMainView                = "loginToTasksViewSegue"
     static let      kExitToLoginViewSegue           = "tasksToLoginViewSegue"
 
 

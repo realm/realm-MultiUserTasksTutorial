@@ -48,8 +48,21 @@ In this section we set up the Cocoapod dependency manager and add Realm's Swift 
 5. Save the file
 6. At the terminal, type `pod install` - this will cause the Cocoapods system to fetch the RealmSwift and RealmLoginKit modules, as well as create a new Xcode workspace file which enabled these modules to be used in this project.
 
+## 3. Setting up the Application Delegate
+In this seciton we will configure the applicaiton degelgate to support a Navigation controller. From the Project Navigator, double-clock the AppDelegate.swift file and edit the file to replace the `func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions` method with the following:
 
-## 3. Setting Up the Storyboard & Views
+```swift
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    var window: UIWindow?
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions:[UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.rootViewController = UINavigationController(rootViewController: ViewController(style: .plain))
+        window?.makeKeyAndVisible()
+        return true
+    }
+}
+```
+## 4. Setting Up the Storyboard & Views
 
 In this section we will set up our login and main view controller's storyboard connections.
 
@@ -84,7 +97,7 @@ The final configfuration will look like this:
 <center> <img src="/Graphics/final-storyboard-config.png" /></center>
 
 
-## 3. Configuring the Login View Controller
+## 5. Configuring the Login View Controller
 
 In this section we will rename and then configure the TasksLoginViewController that will allow you to log in an existing user account, or create a new account
 
@@ -164,7 +177,7 @@ Click the stop button to terminate the app, and we will continue with the rest o
 
 
 
-## 4. Create the Models and Constants Class File
+## 6. Create the Models and Constants Class File
 In this step we are going to create a few constants to help us manage our Realm as well as the class models our Realm will operate on.
 
 From the Project Navigator, right click and select `New File` and when the file selector apprears select `Swift File` and name the file `ConstantsAndModels` and press preturn.  Xcode will create a new Swift file and open it in the editor.
@@ -234,7 +247,7 @@ At this point, we've created a login system, and defined the data models (`Task`
 
 Your app should still build and run.
 
-## 5. The TaskList Controller: Add a title and register a cell class for use with our table view
+## 7. The TaskList Controller: Add a title and register a cell class for use with our table view
 
 In this section we will create and configure our TasksTableViewController.
 
@@ -265,6 +278,7 @@ override func viewDidLoad() {
 }
 
 func setupUI() {
+  se;f
     title = "My Tasks"
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
 }
@@ -300,7 +314,7 @@ override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexP
 
 If you then build and run the app, you'll see your one task being displayed in the table. There's also some code in here to show completed items as a little lighter than uncompleted items, but we won't see that in action until later.
 
-## 6. Add support for creating new tasks
+## 8. Add support for creating new tasks
 
 Delete the line in your `viewDidLoad()` function that seeded initial data:
 
@@ -345,7 +359,7 @@ func setupUI() {
 }
 ```
 
-## 7. Back items by a Realm and integrate sync
+## 9. Back items by a Realm and integrate sync
 
 Now, add the following properties to your `ViewController` class, just under the `items` property:
 
@@ -444,11 +458,14 @@ If you build and run the app now, it should connect to the object server and dis
 
 If you add new tasks by tapping the "Add" button in your app, you should immediately see them reflected in the RealmTasks app too.
 
+
+<center> <img src="/Graphics/Tasks-initial-view.png"  width="310" height="552" /></center>
+
 **Congratulations, you've built your first synced Realm app!**
 
 Keep going if you'd like to see how easy it is to add more functionality and finish building your task management app.
 
-## 8. Support moving and deleting tasks
+## 10. Support moving and deleting tasks
 
 Add the following line to the end of your `setupUI()` function:
 
@@ -478,7 +495,7 @@ override func tableView(_ tableView: UITableView, commit editingStyle: UITableVi
 }
 ```
 
-## 9. Support toggling the 'completed' state of a task by tapping it
+## 11. Support toggling the 'completed' state of a task by tapping it
 
 After the last `tableView` function in the `ViewController` class, add the following function override:
 
@@ -500,7 +517,9 @@ override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: Inde
     }
 }
 ```
-## 10. Adding a Logout Capabilities
+
+
+## 12. Adding a Logout Capabilities
 
 In this section we're going to add a logoout capability
 Add the following two methods to the bottom of the TaskViewController class
@@ -532,4 +551,7 @@ Add the following two methods to the bottom of the TaskViewController class
 
 this code supports the logot button in the TaskTable View navigation controller and will log theuser out and take them back to the RealmLoginKit panel.
 
-## 11. You're done!
+
+<center> <img src="/Graphics/Tasks-logout.png"  width="310" height="552" /></center>
+
+## 13. You're done!

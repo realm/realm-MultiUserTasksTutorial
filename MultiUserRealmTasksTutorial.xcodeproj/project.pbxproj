@@ -9,14 +9,14 @@
 /* Begin PBXBuildFile section */
 		5959363858028F74C2A97A6A /* Pods_MultiUserRealmTasksTutorialUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0437B87E7F9736F022097B4 /* Pods_MultiUserRealmTasksTutorialUITests.framework */; };
 		8B0CEB311EE72E51004B11FF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0CEB301EE72E51004B11FF /* AppDelegate.swift */; };
-		8B0CEB331EE72E51004B11FF /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0CEB321EE72E51004B11FF /* LoginViewController.swift */; };
 		8B0CEB361EE72E51004B11FF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B0CEB341EE72E51004B11FF /* Main.storyboard */; };
 		8B0CEB381EE72E51004B11FF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B0CEB371EE72E51004B11FF /* Assets.xcassets */; };
 		8B0CEB3B1EE72E51004B11FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B0CEB391EE72E51004B11FF /* LaunchScreen.storyboard */; };
 		8B0CEB461EE72E51004B11FF /* MultiUserRealmTasksTutorialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0CEB451EE72E51004B11FF /* MultiUserRealmTasksTutorialTests.swift */; };
 		8B0CEB511EE72E51004B11FF /* MultiUserRealmTasksTutorialUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0CEB501EE72E51004B11FF /* MultiUserRealmTasksTutorialUITests.swift */; };
+		8B0F4BD31EE8B9EF000CD325 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0CEB321EE72E51004B11FF /* LoginViewController.swift */; };
+		8B0F4BD41EE8B9F5000CD325 /* TasksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8AF4121EE76CEA00C264A8 /* TasksTableViewController.swift */; };
 		8B8AF4111EE75CCE00C264A8 /* ConstantsAndModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8AF4101EE75CCE00C264A8 /* ConstantsAndModels.swift */; };
-		8B8AF4131EE76CEA00C264A8 /* TasksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8AF4121EE76CEA00C264A8 /* TasksTableViewController.swift */; };
 		934FC14AE81EAC33BF1B55B5 /* Pods_MultiUserRealmTasksTutorialTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87C4DA13416B86CD3C1FA720 /* Pods_MultiUserRealmTasksTutorialTests.framework */; };
 		9F2B2B4ED5561F59539D724F /* Pods_MultiUserRealmTasksTutorial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64323A397D113AEC86E7B7C6 /* Pods_MultiUserRealmTasksTutorial.framework */; };
 /* End PBXBuildFile section */
@@ -455,9 +455,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B0CEB331EE72E51004B11FF /* LoginViewController.swift in Sources */,
+				8B0F4BD31EE8B9EF000CD325 /* LoginViewController.swift in Sources */,
 				8B8AF4111EE75CCE00C264A8 /* ConstantsAndModels.swift in Sources */,
-				8B8AF4131EE76CEA00C264A8 /* TasksTableViewController.swift in Sources */,
+				8B0F4BD41EE8B9F5000CD325 /* TasksTableViewController.swift in Sources */,
 				8B0CEB311EE72E51004B11FF /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -2,8 +2,16 @@
 
 This tutorial will guide you through writing an iOS app using Realm Swift to sync with the RealmTasks demo apps.
 
+The rest of this tutorial will show you how to:
+  1. Setup a new Realm-based project from scratch using Cocoapods
+  2. How to adopt and setup a free Realm utility module called `RealmLoginKit` which allows you to easily created multi-user ready applications with almost zero coding
+  3. How to create a simple Realm-based Task Manager that can interoperte with the fullly-fetures RealmTasks that comes with the Realm Mobile Platform distribution
+
+In order to successfuly complete this tutorial you will need a Macintosh running macOS 10.12 or later, as well as a copy of Xcode 8.2.3 or later.
+
 First, [install the MacOS bundle](get-started/installation/mac) if you haven't yet. This will get you set up with the Realm Mobile Platform including a local copy of the Realm Object Server and let you launch the macOS version of RealmTasks.
 
+Unless you have already have the Realm Object Server running, you will need to navigate to the downloads folder, open the Realm Object Server folder and double-click on the `start-object-server.command` file. This will start the local copy of the Realm Object Server.  After a few moments your browser will open and you will be prompted to create a new admin account and reguster your copy of the server.  Once you have completre this set, you are ready to being the Realm Tasks tutorial, below.
 
 ## 1. Create a new Xcode project
 
@@ -105,7 +113,7 @@ class TasksLoginViewController: UITableViewController {
 	var token: NotificationToken!
 	var myIdentity = SyncUser.current?.identity!
 
-  
+
 ```
 
   6. Next, modify the empty `viewWillAppear` method to

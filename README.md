@@ -30,24 +30,23 @@ In this section we will create the basic iOS iPhone application skeleton needed 
 
 In this section we set up the Cocoapod dependency manager and add Realm's Swift bindings and a utility module that allows us to create a multi-user application using a preconfigured login panel
 
- 1. Quit Xcode
- 2. Open a Terminal window and change to the directory/folder where you created the Xcode _RealmTasksTutorial_ project
- 2. If you have not already done so, install the [Cocoapods system](https://cocoapods.org/)
+1. Quit Xcode
+2. Open a Terminal window and change to the directory/folder where you created the Xcode _RealmTasksTutorial_ project
+2. If you have not already done so, install the [Cocoapods system](https://cocoapods.org/)
 	 - Full details are available via the Cocopods site, but the simplest instructions are to type ``sudo gem install cocoapods`` in a terminal window
- 3. Initialize a new Cocoapods Podfile with ```pod init```  A new file called `Podfile` will be created.
- 4. Edit the Podfile find the the comment line that reads:
+3. Initialize a new Cocoapods Podfile with ```pod init```  A new file called `Podfile` will be created.
+4. Edit the Podfile,  find the the comment line that reads:
 
- ` # Pods for MultiUserRealmTasksTutorial`
+  ` # Pods for MultiUserRealmTasksTutorial`
+	 And add the following after this line:
 
-	And add the following:
+    ```ruby
+    pod 'RealmSwift'
+    pod 'RealmLoginKit'
+    ```
 
-```ruby
-pod 'RealmSwift'
-pod 'RealmLoginKit'
-```
-
- 5. Save the file
- 6. At the terminal, type `pod install` - this will cause the Cocoapods system to fetch the RealmSwift and RealmLoginKit modules, as well as create a new Xcode workspace file which enabled these modules to be used in this project.
+5. Save the file
+6. At the terminal, type `pod install` - this will cause the Cocoapods system to fetch the RealmSwift and RealmLoginKit modules, as well as create a new Xcode workspace file which enabled these modules to be used in this project.
 
 
 ## 3. Setting Up the Storyboard & Views
@@ -60,11 +59,11 @@ In this section we will set up our login and main view controller's storyboard c
 
 3. In the Xcode project navigator select the `main.storyboard` file. Interface builder (IB) will open and show the default single view layout:
 
-	<center><img src="/Graphics/InterfaceBuilder-start.png"> 	</center>
+<center><img src="/Graphics/InterfaceBuilder-start.png"> 	</center>
 
 3. Adding the TableViewController - on the lower right of the window is the object browser, type "tableview" to narrow down the possible IB objects. There will be a "TableView Controller" object visible. Drag this onto the canvas. Once you have done this the Storyboard view will resemble this:
 
-	<center> <img src="/Graphics/Adding-theTableViewController.png" /></center>
+<center> <img src="/Graphics/Adding-theTableViewController.png" /></center>
 
 
 Once you have added the second view controller, you will need to connect the two controllers by a pair of segues, as well as add class names/storyboard IDs for each controller to prepare for the code will be adding in the next sections:
@@ -90,71 +89,68 @@ The final configfuration will look like this:
 In this section we will rename and then configure the TasksLoginViewController that will allow you to log in an existing user account, or create a new account
 
 
-  1. Open the  `view controller` file in the project naivator. Click once on it to enable editing of the file name; change the name to `TasksLoginViewController` and press return to rename the file.
-  2. Clicking on the filename should also have opened the newly renamed file in the editor. Here too you should replace all references to `ViewController` in the comments and class name with `TasksLoginViewController`
-  3. Next, we are going to update the contents of this view controller and take it from a generic, empty controller to one that can display our Login Panel.
+1. Open the  `view controller` file in the project naivator. Click once on it to enable editing of the file name; change the name to `TasksLoginViewController` and press return to rename the file.
 
-  4. Start by modifying the imports to read as follows:
+2. Clicking on the filename should also have opened the newly renamed file in the editor. Here too you should replace all references to `ViewController` in the comments and class name with `TasksLoginViewController`
 
+3. Next, we are going to update the contents of this view controller and take it from a generic, empty controller to one that can display our Login Panel.
 
-```swift
-import UIKit
-import RealmSwift
-import RealmLoginKit
-```
+4. Start by modifying the imports to read as follows:
+    ```swift
+    import UIKit
+    import RealmSwift
+    import RealmLoginKit
+    ```
 
+5. Modify the top of the class file so the following properties are declared:
 
+    ```swift
+    class TasksLoginViewController: UITableViewController {
+    var loginViewController: LoginViewController!
+    var token: NotificationToken!
+    var myIdentity = SyncUser.current?.identity!
 
-  5. Modify the top of the class file so the following properties are declared:
+    ```
 
-```swift
-class TasksLoginViewController: UITableViewController {
-	var loginViewController: LoginViewController!
-	var token: NotificationToken!
-	var myIdentity = SyncUser.current?.identity!
+6. Next, modify the empty `viewWillAppear` method to
 
+        ```swift
+        override func viewDidAppear(_ animated: Bool) {
+            loginViewController = LoginViewController(style: .lightOpaque)
+            loginViewController.isRegistering = true
 
-```
+            if (SyncUser.current != nil) {
+                // yup - we've got a stored session, so just go right to the UITabView
+                Realm.Configuration.defaultConfiguration = Constants.commonRealmConfig
 
-  6. Next, modify the empty `viewWillAppear` method to
+                performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
+            } else {
+                // show the RealmLoginKit controller
+                if loginViewController!.serverURL == nil {
+                    loginViewController!.serverURL = Constants.syncAuthURL.absoluteString
+                }
+                // Set a closure that will be called on successful login
+                loginViewController.loginSuccessfulHandler = { user in
+                    DispatchQueue.main.async {
 
-```swift
-override func viewDidAppear(_ animated: Bool) {
-    loginViewController = LoginViewController(style: .lightOpaque)
-    loginViewController.isRegistering = true
+                        Realm.asyncOpen(configuration: Constants.tasksRealmConfig) { realm, error in
+                            if let realm = realm {
+                                Realm.Configuration.defaultConfiguration = Constants.tasksRealmConfig
+                                self.loginViewController!.dismiss(animated: true, completion: nil)
+                                self.performSegue(withIdentifier: Constants.kLoginToMainView, sender: nil)
 
-    if (SyncUser.current != nil) {
-        // yup - we've got a stored session, so just go right to the UITabView
-        Realm.Configuration.defaultConfiguration = Constants.commonRealmConfig
+                            } else if let error = error {
+                                print("An error occurred while loggin in: \(error.localizedDescription)")
+                            }
+                        } // of asyncOpen()
 
-        performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
-    } else {
-        // show the RealmLoginKit controller
-        if loginViewController!.serverURL == nil {
-            loginViewController!.serverURL = Constants.syncAuthURL.absoluteString
+                    } // of main queue dispatch
+                }// of login controller
+
+                present(loginViewController, animated: true, completion: nil)
+            }
         }
-        // Set a closure that will be called on successful login
-        loginViewController.loginSuccessfulHandler = { user in
-            DispatchQueue.main.async {
-
-                Realm.asyncOpen(configuration: Constants.tasksRealmConfig) { realm, error in
-                    if let realm = realm {
-                        Realm.Configuration.defaultConfiguration = Constants.tasksRealmConfig
-                        self.loginViewController!.dismiss(animated: true, completion: nil)
-                        self.performSegue(withIdentifier: Constants.kLoginToMainView, sender: nil)
-
-                    } else if let error = error {
-                        print("An error occurred while loggin in: \(error.localizedDescription)")
-                    }
-                } // of asyncOpen()
-
-            } // of main queue dispatch
-        }// of login controller
-
-        present(loginViewController, animated: true, completion: nil)
-    }
-}
-	```
+        	```
 
 Optionally, commit your progress in source control.
 
@@ -183,35 +179,36 @@ import Foundation
 import RealmSwift
 
 struct Constants {
-    // segue names
-    static let      kLoginToMainView                = "loginToMainViewSegue"
-    static let      kExitToLoginViewSegue           = "segueToLogin"
+    // segue names - these connect our two views
+    static let      kLoginToMainView           = "loginToMainViewSegue"
+    static let      kExitToLoginViewSegue      = "segueToLogin"
 
 
     // the host that will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1
     // if you are using the Professional or Enterprise Editions, then this will be a host on the Internet
-    static let defaultSyncHost                      = "127.0.0.1"
+    static let defaultSyncHost                 = "127.0.0.1"
 
     // this is purely for talking to the RMP auth system
-    static let syncAuthURL                          = URL(string: "http://\(defaultSyncHost):9080")!
+    static let syncAuthURL                     = URL(string: "http://\(defaultSyncHost):9080")!
 
     // The following URLs and URI fragments are about talking to the synchronization service and the Realms
     // it manages on behalf of your application:
-    static let syncServerURL                        = URL(string: "realm://\(defaultSyncHost):9080/")
+    static let syncServerURL                   = URL(string: "realm://\(defaultSyncHost):9080/")
 
     // Note: When we say "Realm" file we mean the entire collection of models/schemas represented by that Realm...
     // So we need to be very clear what models that are represented by a given Realm.  For example:
 
     //  this is a task Realm comptible with the full version of RealmTasks for iOS/Android/C#
-    static let tasksRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/Tasks")!
-    static let tasksRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: tasksRealmURL),objectTypes: [TaskList.self, Task.self])
+    static let tasksRealmURL                   = URL(string: "realm://\(defaultSyncHost):9080/~/Tasks")!
+    static let tasksRealmConfig                = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: tasksRealmURL),objectTypes: [TaskList.self, Task.self])
 
 }
 
 ```
 
-Next, we'll add the definitions of our models.  Note that there are two kinds of models here: the Task and taskList models.
+There key tings to note here are how the contnts are layered togetehr to create a set of accessors that allow you to quickly and easily create references to a Realm.  This example shows a single Realm but in more complete projects one could imagine having a number of such accessors created for a number of special purpose Realms.
 
+Next, we'll add the definitions of our models.  Note that there are two kinds of models here: the Task and taskList models.
 
 ```swift
 
@@ -240,7 +237,6 @@ Your app should still build and run.
 ## 5. The TaskList Controller: Add a title and register a cell class for use with our table view
 
 In this section we will create and configure our TasksTableViewController.
-
 
 In the project navigator, right-click on the "MultiUserRealmTasksTutorial" group and select new file agin. This time you will select a "Cocoa Touch" class, then press "Next"  For the *class* section you want to enter `TasksTableViewController` which is the name you entered when you created and configured the view contrlller in the storyboard; for *Subclass of* you want to enter UITableViewContgroller (typing the first few characters will cause Xcode to help with autocompletion suggestions).
 
@@ -342,7 +338,10 @@ Now add the following line at the end of the `setupUI()` function:
 ```swift
 func setupUI() {
     // ... existing function ...
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+
+    let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+    let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
+    navigationItem.rightBarButtonItems =  [addButton, logoutButton]
 }
 ```
 
@@ -362,12 +361,6 @@ The notification token we just added will be needed when we start observing chan
 Right after the end of the `setupUI()` function, add the following:
 
 ```swift
-func setupRealm() {
-    // Log in existing user with username and password
-    let username = "test"  // <--- Update this
-    let password = "test"  // <--- Update this
-}
-
 deinit {
     notificationToken.stop()
 }
@@ -507,6 +500,40 @@ override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: Inde
     }
 }
 ```
-## 10. Adding a Logout Buton
+## 10. Adding a Logout Capabilities
 
+In this section we're going to add a logoout capability
+Add the following two methods to the bottom of the TaskViewController class
+```swift
+// Logout Support
+
+
+@IBAction  func handleLogout(sender:AnyObject?) {
+    let alert = UIAlertController(title: NSLocalizedString("Logout", comment: "Logout"), message: NSLocalizedString("Really Log Out?", comment: "Really Log Out?"), preferredStyle: .alert)
+
+    // Logout button
+    let OKAction = UIAlertAction(title: NSLocalizedString("Logout", comment: "logout"), style: .default) { (action:UIAlertAction!) in
+        SyncUser.current?.logOut()
+        //Now we need to segue to the login view controller
+        self.performSegue(withIdentifier: Constants.kExitToLoginViewSegue, sender: self)
+    }
+    alert.addAction(OKAction)
+
+    // Cancel button
+    let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction!) in
+        print("Cancel button tapped");
+    }
+    alert.addAction(cancelAction)
+
+    // Present Dialog message
+    present(alert, animated: true, completion:nil)
+}
+```
+
+
+and, lastly, modify the class declaration to read:
+
+```swift
+class TasksTableViewController: UITableViewController,  UIGestureRecognizerDelegate {
+```
 ## 11. You're done!

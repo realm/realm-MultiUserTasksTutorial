@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class TasksTableViewController: UITableViewController {
+class TasksTableViewController: UITableViewController,  UIGestureRecognizerDelegate  {
     var realm: Realm!
     var notificationToken: NotificationToken!
     var items = List<Task>()
@@ -46,8 +46,12 @@ class TasksTableViewController: UITableViewController {
         
         title = "My Tasks"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+        
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+        let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
+        navigationItem.rightBarButtonItems =  [addButton, logoutButton]
         navigationItem.leftBarButtonItem = editButtonItem
+
     }
 
     
@@ -91,6 +95,35 @@ class TasksTableViewController: UITableViewController {
         present(alertController, animated: true, completion: nil)
     }
 
+    
+    
+    
+    // Logout Support
+    
+    @IBAction  func handleLogout(sender:AnyObject?) {
+        let alert = UIAlertController(title: NSLocalizedString("Logout", comment: "Logout"), message: NSLocalizedString("Really Log Out?", comment: "Really Log Out?"), preferredStyle: .alert)
+        
+        // Logout button
+        let OKAction = UIAlertAction(title: NSLocalizedString("Logout", comment: "logout"), style: .default) { (action:UIAlertAction!) in
+            SyncUser.current?.logOut()
+            //Now we need to segue to the login view controller
+            self.performSegue(withIdentifier: Constants.kExitToLoginViewSegue, sender: self)
+        }
+        alert.addAction(OKAction)
+        
+        // Cancel button
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction!) in
+            print("Cancel button tapped");
+        }
+        alert.addAction(cancelAction)
+        
+        // Present Dialog message
+        present(alert, animated: true, completion:nil)
+    }
+
+    
+    
+    
     
     // MARK: - Table view Data Source Methods
     

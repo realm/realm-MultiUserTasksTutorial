@@ -12,7 +12,7 @@ import RealmSwift
 struct Constants {
     // segue names
     static let      kLoginToMainView                = "loginToMainViewSegue"
-    static let      kExitToLoginViewSegue           = "segueToLogin"
+    static let      kExitToLoginViewSegue           = "tasksToLoginViewSegue"
 
 
     // the host tht will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1

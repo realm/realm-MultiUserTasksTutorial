@@ -13,8 +13,6 @@ import RealmLoginKit
 class TasksLoginViewController: UIViewController {
     var loginViewController: LoginViewController!
     var token: NotificationToken!
-    var myIdentity = SyncUser.current?.identity!
-    var thePersonRecord: Person?
 
     override func viewDidLoad() {
         super.viewDidLoad()

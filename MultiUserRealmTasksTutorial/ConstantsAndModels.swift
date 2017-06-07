@@ -15,7 +15,7 @@ struct Constants {
     static let      kExitToLoginViewSegue           = "tasksToLoginViewSegue"
 
 
-    // the host tht will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1
+    // the host that will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1
     // if you are using the Professional or Enterprise Editions, then this will be a host on the Internet
     static let defaultSyncHost                      = "127.0.0.1"
     

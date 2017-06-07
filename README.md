@@ -510,5 +510,6 @@ override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: Inde
     }
 }
 ```
+## 10. Adding a Logout Buton
 
-## 10. You're done!
+## 11. You're done!

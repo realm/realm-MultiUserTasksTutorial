@@ -111,56 +111,60 @@ class TasksLoginViewController: UITableViewController {
   6. Next, modify the empty `viewWillAppear` method to
 
 ```swift
-	override func viewDidAppear(_ animated: Bool) {
-			loginViewController = LoginViewController(style: .lightOpaque)
-			loginViewController.isRegistering = true
+override func viewDidAppear(_ animated: Bool) {
+    loginViewController = LoginViewController(style: .lightOpaque)
 
-			if (SyncUser.current != nil) {
-					// yup - we've got a stored session, so just go right to the UITabView
-					Realm.Configuration.defaultConfiguration = ConstandsAndModels.commonRealmConfig
-					performSegue(withIdentifier: ConstandsAndModels.kLoginToMainView, sender: self)
-			} else {
-					// show the RealmLoginKit controller
-					if loginViewController!.serverURL == nil {
-							loginViewController!.serverURL = ConstandsAndModels.syncAuthURL.absoluteString
-					}
-					// Set a closure that will be called on successful login
-					loginViewController.loginSuccessfulHandler = { user in
-							DispatchQueue.main.async {
+    loginViewController.isServerURLFieldHidden = true // the user doesn't need to see the server IP in production.
+    loginViewController.isRegistering = true
+    loginViewController.copyrightLabelText = ""
 
-									Realm.asyncOpen(configuration: ConstandsAndModels.commonRealmConfig) { realm, error in
-											if let realm = realm {
-													Realm.Configuration.defaultConfiguration = BingoConstants.commonRealmConfig
-													self.thePersonRecord = Person.createProfile()   // let's make this person a local profile in /CommonRealm
-																																					// then dismiss the login view, and...
-													self.loginViewController!.dismiss(animated: true, completion: nil)
+    if (SyncUser.current != nil) {
+        // yup - we've got a stored session, so just go right to the UITabView
+        Realm.Configuration.defaultConfiguration = Constants.commonRealmConfig
 
-													// hop right into the main view for the app
-													self.performSegue(withIdentifier: ConstandsAndModels.kLoginToMainView, sender: nil)
+        performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
+    } else {
+        // show the RealmLoginKit controller
+        //loginViewController = LoginViewController(style: .lightOpaque)
+        if loginViewController!.serverURL == nil {
+            loginViewController!.serverURL = Constants.syncAuthURL.absoluteString
+        }
+        // Set a closure that will be called on successful login
+        loginViewController.loginSuccessfulHandler = { user in
+            DispatchQueue.main.async {
 
-											} else if let error = error {
-												print("An error occurred on login: \(error.description)")
-											}
-									} // of asyncOpen()
-							} // of main queue dispatch
-					}// of login controller
+                Realm.asyncOpen(configuration: Constants.tasksRealmConfig) { realm, error in
+                    if let realm = realm {
+                        Realm.Configuration.defaultConfiguration = Constants.tasksRealmConfig
+                        self.loginViewController!.dismiss(animated: true, completion: nil)
+                        self.performSegue(withIdentifier: Constants.kLoginToMainView, sender: nil)
 
-					present(loginViewController, animated: true, completion: nil)
-			}
-	}
+                    } else if let error = error {
+                        print("An error occurred while loggin in: \(error.localizedDescription)")
+                    }
+                } // of asyncOpen()
+
+            } // of main queue dispatch
+        }// of login controller
+
+        present(loginViewController, animated: true, completion: nil)
+    }
+}
 	```
 
 Optionally, commit your progress in source control.
 
-Your app should now build and run---although so far it doesn't do much, it will show you to login panel you just configured.
+Your app should now build and run---although so far it doesn't do much, it will show you to login panel you just configured:
 
-Click the stop button to temrinate the app, and we will continue with the rest of the changes needed to create our Realm Tasks app.
-
-
-<center> <img src="/Graphics/TaskLoginView.png" /></center>
+<center> <img src="/Graphics/TaskLoginView.png"  width="310" height="552" /></center>
 
 
-## 4. XCreate the Models and Constants Class File
+Click the stop button to terminate the app, and we will continue with the rest of the changes needed to create our Realm Tasks app.
+
+
+
+
+## 4. Create the Models and Constants Class File
 In this step we are going to create a few constants to help us manage our Realm as well as the class models our Realm will operate on.
 
 From the Project Navigator, right click and select `New File` and when the file selector apprears select `Swift File` and name the file `ConstantsAndModels` and press preturn.  Xcode will create a new Swift file and open it in the editor.
@@ -191,14 +195,10 @@ struct Constants {
     // it manages on behalf of your application:
     static let syncServerURL                        = URL(string: "realm://\(defaultSyncHost):9080/")
 
-    // Note: When we say Realm file we mean literally the entire collection of models/schemas inside that Realm...
+    // Note: When we say "Realm" file we mean the entire collection of models/schemas represented by that Realm...
     // So we need to be very clear what models that are represented by a given Realm.  For example:
 
-    // this is a realm where we can store profile info - not covered in the main line of this tutorial
-    static let commonRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/CommonRealm")!
-    static let commonRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: commonRealmURL),objectTypes: [Person.self])
-
-    //  this is a task Realm comptible with the fully version of RealmTasks for iOS/Android/C#
+    //  this is a task Realm comptible with the full version of RealmTasks for iOS/Android/C#
     static let tasksRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/Tasks")!
     static let tasksRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: tasksRealmURL),objectTypes: [TaskList.self, Task.self])
 
@@ -206,7 +206,7 @@ struct Constants {
 
 ```
 
-Next, we'll add the definitions of our models.  Note that there are two kinds of models here: 1) the Task and taskList modes, and 2) a "Person" model.  This last model will allow us to store some meta data (first andm last name) about users of the app. It will be used only by this demo application and is instantiated in such a way the it can cleanly interoperate with other versions of the app that are not multi-user aware.
+Next, we'll add the definitions of our models.  Note that there are two kinds of models here: the Task and taskList models.
 
 
 ```swift
@@ -235,18 +235,28 @@ Your app should still build and run.
 
 ## 5. The TaskList Controller: Add a title and register a cell class for use with our table view
 
-In this section we will created and configure our TasksTableViewController.
+In this section we will create and configure our TasksTableViewController.
 
 
-In the project navigator, right-click on the "MultiUserRealmTasksTutorial" group and select new file agin. This time you will select a "Cocoa Touch" class, then press "Next"  For the *class* section you want to enter `TasksTableViewController` whch is the name you entered when you created and configured the view contrlller in the storyboard; for *Subclass of* you want to enter UITableViewContgroller (typing the first few characters will cause Xcode to help with autocompletion suggestions).
+In the project navigator, right-click on the "MultiUserRealmTasksTutorial" group and select new file agin. This time you will select a "Cocoa Touch" class, then press "Next"  For the *class* section you want to enter `TasksTableViewController` which is the name you entered when you created and configured the view contrlller in the storyboard; for *Subclass of* you want to enter UITableViewContgroller (typing the first few characters will cause Xcode to help with autocompletion suggestions).
 
 
 <center> <img src="/Graphics/Create-TaskTableViewController.png" /></center>
 
-The language should be set to "Swift. Clck "next" and save the file alond side the other files in this project.
+The language should be set to "Swift. Click "next" and save the file alond side the other files in this project.
+
+Xcode will open the file and we can now start configuring this view controller by replacing or editing the metods as indicated below:
 
 
-Xcode will open the file and we can now start configuring this view controller: class.
+Use a Realm List to references Tasks in the table view:
+
+Add the following property to your `ViewController` class, on a new line, right after the class declaration:
+
+```swift
+var items = List<Task>()
+```
+
+Next, we'll have a method that configures the Table View when the controller loads.  Edit the `ViewDidLoad` method as follows:
 
 ```swift
 override func viewDidLoad() {
@@ -260,13 +270,6 @@ func setupUI() {
 }
 ```
 
-## 5. Use a Realm List to display Tasks in the table view
-
-Add the following property to your `ViewController` class, on a new line, right after the class declaration:
-
-```swift
-var items = List<Task>()
-```
 
 Add the following line to the end of your `viewDidLoad()` function to seed the list with some initial data:
 
@@ -372,32 +375,22 @@ Then insert the following at the end of the `setupRealm()` function (inside the 
 
 ```swift
 func setupRealm() {
-    // ... existing function ...
-    SyncUser.logIn(with: .usernamePassword(username: username, password: password, register: false), server: URL(string: "http://127.0.0.1:9080")!) { user, error in
-        guard let user = user else {
-            fatalError(String(describing: error))
+    DispatchQueue.main.async {
+        // Open Realm
+        self.realm = try! Realm(configuration: Constants.tasksRealmConfig)
+
+        // Show initial tasks
+        func updateList() {
+            if self.items.realm == nil, let list = self.realm.objects(TaskList.self).first {
+                self.items = list.items
+            }
+            self.tableView.reloadData()
         }
+        updateList()
 
-        DispatchQueue.main.async {
-            // Open Realm
-            let configuration = Realm.Configuration(
-                syncConfiguration: SyncConfiguration(user: user, realmURL: URL(string: "realm://127.0.0.1:9080/~/realmtasks")!)
-            )
-            self.realm = try! Realm(configuration: configuration)
-
-            // Show initial tasks
-            func updateList() {
-                if self.items.realm == nil, let list = self.realm.objects(TaskList.self).first {
-                    self.items = list.items
-                }
-                self.tableView.reloadData()
-            }
+        // Notify us when Realm changes
+        self.notificationToken = self.realm.addNotificationBlock { _ in
             updateList()
-
-            // Notify us when Realm changes
-            self.notificationToken = self.realm.addNotificationBlock { _ in
-                updateList()
-            }
         }
     }
 }

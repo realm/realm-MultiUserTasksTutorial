@@ -34,7 +34,7 @@ struct Constants {
     static let commonRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: commonRealmURL),objectTypes: [Person.self])
     
     //  this is a task Realm comptible with the fully version of RealmTasks for iOS/Android/C#
-    static let tasksRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/Tasks")!
+    static let tasksRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/~/realmtasks")!
     static let tasksRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: tasksRealmURL),objectTypes: [TaskList.self, Task.self])
 
 }

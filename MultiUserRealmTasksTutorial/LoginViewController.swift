@@ -24,10 +24,8 @@ class TasksLoginViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         loginViewController = LoginViewController(style: .lightOpaque)
-        
-        loginViewController.isServerURLFieldHidden = true // the user doesn't need to see the server IP in production.
+        loginViewController.isServerURLFieldHidden = false
         loginViewController.isRegistering = true
-        loginViewController.copyrightLabelText = ""
         
         if (SyncUser.current != nil) {
             // yup - we've got a stored session, so just go right to the UITabView
@@ -36,26 +34,21 @@ class TasksLoginViewController: UIViewController {
             performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
         } else {
             // show the RealmLoginKit controller
-            //loginViewController = LoginViewController(style: .lightOpaque)
             if loginViewController!.serverURL == nil {
                 loginViewController!.serverURL = Constants.syncAuthURL.absoluteString
             }
             // Set a closure that will be called on successful login
             loginViewController.loginSuccessfulHandler = { user in
                 DispatchQueue.main.async {
-                    
+                    // this AsyncOpen call will open the described Realm and wait for it to download before calling its closure
                     Realm.asyncOpen(configuration: Constants.commonRealmConfig) { realm, error in
                         if let realm = realm {
                             Realm.Configuration.defaultConfiguration = Constants.commonRealmConfig
-                            self.thePersonRecord = Person.createProfile()   // let's make this person a local profile in /~/BingoPrivate
-                            // then dismiss the login view, and...
                             self.loginViewController!.dismiss(animated: true, completion: nil)
-                            
-                            // hop right into the main view for the app (this will be set up by the positioning of the tabs in either app
                             self.performSegue(withIdentifier: Constants.kLoginToMainView, sender: nil)
                             
                         } else if let error = error {
-                            print("An error occurred while loggin in: \(error.localizedDescription)")
+                            print("An error occurred while logging in: \(error.localizedDescription)")
                         }
                     } // of asyncOpen()
                     

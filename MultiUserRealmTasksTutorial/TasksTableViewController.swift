@@ -7,8 +7,11 @@
 //
 
 import UIKit
+import RealmSwift
 
 class TasksTableViewController: UITableViewController {
+    var realm: Realm!
+    var notificationToken: NotificationToken!
     var items = List<Task>()
 
     override func viewDidLoad() {
@@ -21,8 +24,10 @@ class TasksTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
         setupUI()
-        items.append(Task(value: ["text": "My First Task"]))
+        setupRealm()
 
+        // Note - this is solely to allow you to see an initial task - it can be remoed after the first run.
+        items.append(Task(value: ["text": "My First Task"]))
     }
 
     override func didReceiveMemoryWarning() {
@@ -30,16 +35,6 @@ class TasksTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    // MARK: - Table view data source
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
-    override func tableView(_ tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-        return items.count
-    }
     
     
     
@@ -48,21 +43,106 @@ class TasksTableViewController: UITableViewController {
     // Realm Specific Code
     
     func setupUI() {
+        
         title = "My Tasks"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+        navigationItem.leftBarButtonItem = editButtonItem
     }
 
     
-    
-    // UITableView Methods
+    func setupRealm() {
+        DispatchQueue.main.async {
+            // Open Realm
+            self.realm = try! Realm(configuration: Constants.tasksRealmConfig)
+            
+            // Show initial tasks
+            func updateList() {
+                if self.items.realm == nil, let list = self.realm.objects(TaskList.self).first {
+                    self.items = list.items
+                }
+                self.tableView.reloadData()
+            }
+            updateList()
+            
+            // Notify us when Realm changes
+            self.notificationToken = self.realm.addNotificationBlock { _ in
+                updateList()
+            }
+        }
+    }
 
     
+    func add() {
+        let alertController = UIAlertController(title: "New Task", message: "Enter Task Name", preferredStyle: .alert)
+        var alertTextField: UITextField!
+        alertController.addTextField { textField in
+            alertTextField = textField
+            textField.placeholder = "Task Name"
+        }
+        alertController.addAction(UIAlertAction(title: "Add", style: .default) { _ in
+            guard let text = alertTextField.text , !text.isEmpty else { return }
+            
+            let items = self.items
+            try! items.realm?.write {
+                items.insert(Task(value: ["text": text]), at: items.filter("completed = false").count)
+            }
+        })
+        present(alertController, animated: true, completion: nil)
+    }
+
+    
+    // MARK: - Table view Data Source Methods
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    override func tableView(_ tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
+        return items.count
+    }
+
+    // MARK: - UITableView Delegate Methods
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let item = items[indexPath.row]
+        try! item.realm?.write {
+            item.completed = !item.completed
+            let destinationIndexPath: IndexPath
+            if item.completed {
+                // move cell to bottom
+                destinationIndexPath = IndexPath(row: items.count - 1, section: 0)
+            } else {
+                // move cell just above the first completed item
+                let completedCount = items.filter("completed = true").count
+                destinationIndexPath = IndexPath(row: items.count - completedCount - 1, section: 0)
+            }
+            items.move(from: indexPath.row, to: destinationIndexPath.row)
+        }
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let item = items[indexPath.row]
         cell.textLabel?.text = item.text
         cell.textLabel?.alpha = item.completed ? 0.5 : 1
         return cell
+    }
+
+    
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        try! items.realm?.write {
+            items.move(from: sourceIndexPath.row, to: destinationIndexPath.row)
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            try! realm.write {
+                let item = items[indexPath.row]
+                realm.delete(item)
+            }
+        }
     }
 
     /*
@@ -73,24 +153,6 @@ class TasksTableViewController: UITableViewController {
     }
     */
 
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
 
     /*
     // Override to support conditional rearranging of the table view.
@@ -100,6 +162,8 @@ class TasksTableViewController: UITableViewController {
     }
     */
 
+    
+    
     /*
     // MARK: - Navigation
 

@@ -104,8 +104,8 @@ class TasksLoginViewController: UITableViewController {
 	var loginViewController: LoginViewController!
 	var token: NotificationToken!
 	var myIdentity = SyncUser.current?.identity!
-	var thePersonRecord: Person?
-}
+
+  
 ```
 
   6. Next, modify the empty `viewWillAppear` method to
@@ -113,10 +113,7 @@ class TasksLoginViewController: UITableViewController {
 ```swift
 override func viewDidAppear(_ animated: Bool) {
     loginViewController = LoginViewController(style: .lightOpaque)
-
-    loginViewController.isServerURLFieldHidden = true // the user doesn't need to see the server IP in production.
     loginViewController.isRegistering = true
-    loginViewController.copyrightLabelText = ""
 
     if (SyncUser.current != nil) {
         // yup - we've got a stored session, so just go right to the UITabView
@@ -125,7 +122,6 @@ override func viewDidAppear(_ animated: Bool) {
         performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
     } else {
         // show the RealmLoginKit controller
-        //loginViewController = LoginViewController(style: .lightOpaque)
         if loginViewController!.serverURL == nil {
             loginViewController!.serverURL = Constants.syncAuthURL.absoluteString
         }
@@ -184,7 +180,7 @@ struct Constants {
     static let      kExitToLoginViewSegue           = "segueToLogin"
 
 
-    // the host tht will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1
+    // the host that will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1
     // if you are using the Professional or Enterprise Editions, then this will be a host on the Internet
     static let defaultSyncHost                      = "127.0.0.1"
 

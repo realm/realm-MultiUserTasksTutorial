@@ -472,9 +472,24 @@ Add the following line to the end of your `setupUI()` function:
 ```swift
 func setupUI() {
     // ... existing function ...
-    navigationItem.leftBarButtonItem = editButtonItem
+        title = "My Tasks"
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+
+        // we don't have a UINavigationController so let's add a hand-constructed UINavBar
+        let screenSize: CGRect = UIScreen.main.bounds
+        let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
+        let navItem = UINavigationItem(title: "")
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+        let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
+        navItem.rightBarButtonItems =  [addButton, logoutButton]
+        navItem.leftBarButtonItem = editButtonItem
+        navBar.setItems([navItem], animated: false)
+
+        self.view.addSubview(navBar)
 }
 ```
+
+This will add the controls we need to add items or logout out of the application
 
 Now, add these functions to the `ViewController` class body, right after the other `tableView` functions:
 

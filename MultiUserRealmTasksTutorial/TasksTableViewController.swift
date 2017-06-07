@@ -40,18 +40,23 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
     
     
     
-    // Realm Specific Code
+    // MARK: - Realm Specific Code
     
     func setupUI() {
-        //self.navigationController?.isNavigationBarHidden = false
         title = "My Tasks"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
+        // we don't have a UINavigationController so let's add a hand-constructed UINavBar
+        let screenSize: CGRect = UIScreen.main.bounds
+        let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
+        let navItem = UINavigationItem(title: "")
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
         let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
-        navigationItem.rightBarButtonItems =  [addButton, logoutButton]
-        navigationItem.leftBarButtonItem = editButtonItem
+        navItem.rightBarButtonItems =  [addButton, logoutButton]
+        navItem.leftBarButtonItem = editButtonItem
+        navBar.setItems([navItem], animated: false)
 
+        self.view.addSubview(navBar)
     }
 
     
@@ -98,8 +103,6 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
     
     
     
-    // Logout Support
-    
     @IBAction  func handleLogout(sender:AnyObject?) {
         let alert = UIAlertController(title: NSLocalizedString("Logout", comment: "Logout"), message: NSLocalizedString("Really Log Out?", comment: "Really Log Out?"), preferredStyle: .alert)
         
@@ -123,7 +126,12 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
 
     
     
+    // MARK: Turn off the staus bar
     
+    open override var prefersStatusBarHidden : Bool {
+        return true
+    }
+
     
     // MARK: - Table view Data Source Methods
     

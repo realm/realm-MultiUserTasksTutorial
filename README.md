@@ -530,10 +530,6 @@ Add the following two methods to the bottom of the TaskViewController class
 }
 ```
 
+this code supports the logot button in the TaskTable View navigation controller and will log theuser out and take them back to the RealmLoginKit panel.
 
-and, lastly, modify the class declaration to read:
-
-```swift
-class TasksTableViewController: UITableViewController,  UIGestureRecognizerDelegate {
-```
 ## 11. You're done!

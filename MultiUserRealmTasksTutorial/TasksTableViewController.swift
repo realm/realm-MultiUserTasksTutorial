@@ -26,7 +26,7 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
         setupUI()
         setupRealm()
 
-        // Note - this is solely to allow you to see an initial task - it can be remoed after the first run.
+        // Note - this is solely to allow you to see an initial task - it can be removed after the first run.
         items.append(Task(value: ["text": "My First Task"]))
     }
 
@@ -83,13 +83,13 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
 
     
     func add() {
-        let alertController = UIAlertController(title: "New Task", message: "Enter Task Name", preferredStyle: .alert)
+        let alertController = UIAlertController(title: NSLocalizedString("New Task", comment:"New Task"), message: NSLocalizedString("Enter Task Name", comment:"task name"), preferredStyle: .alert)
         var alertTextField: UITextField!
         alertController.addTextField { textField in
             alertTextField = textField
-            textField.placeholder = "Task Name"
+            textField.placeholder = NSLocalizedString("Task Name", comment:"task name")
         }
-        alertController.addAction(UIAlertAction(title: "Add", style: .default) { _ in
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("Add", comment:"Add"), style: .default) { _ in
             guard let text = alertTextField.text , !text.isEmpty else { return }
             
             let items = self.items
@@ -115,7 +115,7 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
         alert.addAction(OKAction)
         
         // Cancel button
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction!) in
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment:"cancel"), style: .cancel) { (action:UIAlertAction!) in
             print("Cancel button tapped");
         }
         alert.addAction(cancelAction)

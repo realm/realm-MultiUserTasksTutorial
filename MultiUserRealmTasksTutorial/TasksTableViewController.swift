@@ -19,6 +19,8 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
         
         setupUI()
         setupRealm()
+        
+        items.append(Task(value: ["text": "My First Task"]))
     }
 
     override func didReceiveMemoryWarning() {
@@ -67,18 +69,18 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
             self.notificationToken = self.realm.addNotificationBlock { _ in
                 updateList()
             }
-        }
-    }
+        } // of Dispatch...main
+    }// of setupRealm
 
-    
+
     func add() {
-        let alertController = UIAlertController(title: NSLocalizedString("New Task", comment:"New Task"), message: NSLocalizedString("Enter Task Name", comment:"task name"), preferredStyle: .alert)
+        let alertController = UIAlertController(title: "New Task", message: "Enter Task Name", preferredStyle: .alert)
         var alertTextField: UITextField!
         alertController.addTextField { textField in
             alertTextField = textField
-            textField.placeholder = NSLocalizedString("Task Name", comment:"task name")
+            textField.placeholder = "Task Name"
         }
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("Add", comment:"Add"), style: .default) { _ in
+        alertController.addAction(UIAlertAction(title: "Add", style: .default) { _ in
             guard let text = alertTextField.text , !text.isEmpty else { return }
             
             let items = self.items
@@ -89,7 +91,6 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
         present(alertController, animated: true, completion: nil)
     }
 
-    
     
     
     @IBAction  func handleLogout(sender:AnyObject?) {

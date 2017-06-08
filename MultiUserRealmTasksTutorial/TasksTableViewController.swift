@@ -16,18 +16,9 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
         setupUI()
         setupRealm()
-
-        // Note - this is solely to allow you to see an initial task - it can be removed after the first run.
-        items.append(Task(value: ["text": "My First Task"]))
     }
 
     override func didReceiveMemoryWarning() {
@@ -35,9 +26,7 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
         // Dispose of any resources that can be recreated.
     }
 
-    
-    
-    
+
     
     
     // MARK: - Realm Specific Code

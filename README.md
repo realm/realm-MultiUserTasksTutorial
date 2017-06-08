@@ -297,6 +297,14 @@ override func viewDidLoad() {
 Append the following to the end of your `ViewController` class's body:
 
 ```swift
+
+// MARK: Turn off the staus bar
+
+open override var prefersStatusBarHidden : Bool {
+    return true
+}
+
+
 // MARK: UITableView
 
 override func tableView(_ tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
@@ -353,9 +361,16 @@ Now add the following line at the end of the `setupUI()` function:
 func setupUI() {
     // ... existing function ...
 
+    // we don't have a UINavigationController so let's add a hand-constructed UINavBar
+    let screenSize: CGRect = UIScreen.main.bounds
+    let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
+    let navItem = UINavigationItem(title: "")
     let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
     let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
-    navigationItem.rightBarButtonItems =  [addButton, logoutButton]
+    navItem.leftBarButtonItem = editButtonItem
+    navBar.setItems([navItem], animated: false)
+
+    self.view.addSubview(navBar)
 }
 ```
 
@@ -467,29 +482,17 @@ Keep going if you'd like to see how easy it is to add more functionality and fin
 
 ## 10. Support moving and deleting tasks
 
-Add the following line to the end of your `setupUI()` function:
+Add the following right after the `navItem.rightBarButtonItems` like in your `setupUI()` function:
 
 ```swift
 func setupUI() {
     // ... existing function ...
-        title = "My Tasks"
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-
-        // we don't have a UINavigationController so let's add a hand-constructed UINavBar
-        let screenSize: CGRect = UIScreen.main.bounds
-        let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
-        let navItem = UINavigationItem(title: "")
-        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
-        let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
-        navItem.rightBarButtonItems =  [addButton, logoutButton]
         navItem.leftBarButtonItem = editButtonItem
-        navBar.setItems([navItem], animated: false)
-
-        self.view.addSubview(navBar)
+    // ... existing function ...
 }
 ```
 
-This will add the controls we need to add items or logout out of the application
+This adds the Edit button to the navigation bar.
 
 Now, add these functions to the `ViewController` class body, right after the other `tableView` functions:
 

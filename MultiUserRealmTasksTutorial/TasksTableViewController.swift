@@ -54,7 +54,7 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
     func setupRealm() {
         DispatchQueue.main.async {
             // Open Realm
-            self.realm = try! Realm(configuration: Constants.tasksRealmConfig)
+            self.realm = try! Realm(configuration: tasksRealmConfig(user: SyncUser.current!))
             
             // Show initial tasks
             func updateList() {

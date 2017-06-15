@@ -27,7 +27,7 @@ class TasksLoginViewController: UIViewController {
         
         if (SyncUser.current != nil) {
             // yup - we've got a stored session, so just go right to the UITabView
-            Realm.Configuration.defaultConfiguration = Constants.commonRealmConfig
+            Realm.Configuration.defaultConfiguration = commonRealmConfig(user: SyncUser.current!)
             
             performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
         } else {
@@ -39,9 +39,9 @@ class TasksLoginViewController: UIViewController {
             loginViewController.loginSuccessfulHandler = { user in
                 DispatchQueue.main.async {
                     // this AsyncOpen call will open the described Realm and wait for it to download before calling its closure
-                    Realm.asyncOpen(configuration: Constants.commonRealmConfig) { realm, error in
+                    Realm.asyncOpen(configuration: commonRealmConfig(user: SyncUser.current!)) { realm, error in
                         if let realm = realm {
-                            Realm.Configuration.defaultConfiguration = Constants.commonRealmConfig
+                            Realm.Configuration.defaultConfiguration = commonRealmConfig(user: SyncUser.current!)
                             self.loginViewController!.dismiss(animated: true, completion: nil)
                             self.performSegue(withIdentifier: Constants.kLoginToMainView, sender: nil)
                             

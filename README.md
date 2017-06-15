@@ -130,11 +130,12 @@ In this section we will rename and then configure the TasksLoginViewController t
         ```swift
         override func viewDidAppear(_ animated: Bool) {
             loginViewController = LoginViewController(style: .lightOpaque)
+            loginViewController.isServerURLFieldHidden = false
             loginViewController.isRegistering = true
 
             if (SyncUser.current != nil) {
                 // yup - we've got a stored session, so just go right to the UITabView
-                Realm.Configuration.defaultConfiguration = Constants.commonRealmConfig
+                Realm.Configuration.defaultConfiguration = commonRealmConfig(user: SyncUser.current!)
 
                 performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
             } else {
@@ -145,15 +146,15 @@ In this section we will rename and then configure the TasksLoginViewController t
                 // Set a closure that will be called on successful login
                 loginViewController.loginSuccessfulHandler = { user in
                     DispatchQueue.main.async {
-
-                        Realm.asyncOpen(configuration: Constants.tasksRealmConfig) { realm, error in
+                        // this AsyncOpen call will open the described Realm and wait for it to download before calling its closure
+                        Realm.asyncOpen(configuration: commonRealmConfig(user: SyncUser.current!)) { realm, error in
                             if let realm = realm {
-                                Realm.Configuration.defaultConfiguration = Constants.tasksRealmConfig
+                                Realm.Configuration.defaultConfiguration = commonRealmConfig(user: SyncUser.current!)
                                 self.loginViewController!.dismiss(animated: true, completion: nil)
                                 self.performSegue(withIdentifier: Constants.kLoginToMainView, sender: nil)
 
                             } else if let error = error {
-                                print("An error occurred while loggin in: \(error.localizedDescription)")
+                                print("An error occurred while logging in: \(error.localizedDescription)")
                             }
                         } // of asyncOpen()
 
@@ -190,36 +191,56 @@ Let's start with the Contants; add the following  to the file:
 ```swift
 import Foundation
 import RealmSwift
-
 struct Constants {
-    // segue names - these connect our two views
-    static let      kLoginToMainView           = "loginToMainViewSegue"
-    static let      kExitToLoginViewSegue      = "segueToLogin"
+    // segue names
+    static let      kLoginToMainView                = "loginToTasksViewSegue"
+    static let      kExitToLoginViewSegue           = "tasksToLoginViewSegue"
 
 
     // the host that will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1
     // if you are using the Professional or Enterprise Editions, then this will be a host on the Internet
-    static let defaultSyncHost                 = "127.0.0.1"
+    static let defaultSyncHost                      = "127.0.0.1"
 
     // this is purely for talking to the RMP auth system
-    static let syncAuthURL                     = URL(string: "http://\(defaultSyncHost):9080")!
+    static let syncAuthURL                          = URL(string: "http://\(defaultSyncHost):9080")!
 
     // The following URLs and URI fragments are about talking to the synchronization service and the Realms
     // it manages on behalf of your application:
-    static let syncServerURL                   = URL(string: "realm://\(defaultSyncHost):9080/")
+    static let syncServerURL                        = URL(string: "realm://\(defaultSyncHost):9080/")
 
-    // Note: When we say "Realm" file we mean the entire collection of models/schemas represented by that Realm...
+    // Note: When we say Realm file we mean literally the entire collection of models/schemas inside that Realm...
     // So we need to be very clear what models that are represented by a given Realm.  For example:
 
-    //  this is a task Realm comptible with the full version of RealmTasks for iOS/Android/C#
-    static let tasksRealmURL                   = URL(string: "realm://\(defaultSyncHost):9080/~/Tasks")!
-    static let tasksRealmConfig                = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: tasksRealmURL),objectTypes: [TaskList.self, Task.self])
+    // this is a realm where we can store profile info - not covered in the main line of this tutorial
+    static let commonRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/CommonRealm")!
 
+    // Note: If Swift supported C-style macros, we could simply define the configuration for the tasks Realm like this:
+    //
+    //static let commonRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: commonRealmURL),objectTypes: [Person.self])
+    // However the key bit of information the Realm config needs is which user (e.g., SyncUser) it's being configured with.  As a static
+    // this would get set only once at app launch time -- so if your initial user logs out and someone else tries to log in, the
+    // configuration would still be using the SyncUser.currrent value obtained at launch. So, instead we'll use the function below which
+    // obtains the SyncUser dyanamically.  This same logic appplies to other Realm configs like tasksRealmConfig too.
+
+    //  this is a task Realm comptible with the fully version of RealmTasks for iOS/Android/C#
+    static let tasksRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/~/realmtasks")!
+
+    //  static let tasksRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL:    tasksRealmURL),objectTypes: [TaskList.self, Task.self])
+}
+
+func commonRealmConfig(user: SyncUser) -> Realm.Configuration  {
+    let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: TeamWorkConstants.commonRealmURL), objectTypes: [Person.self])
+    return config
+}
+
+func tasksRealmConfig(user: SyncUser) -> Realm.Configuration  {
+    let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: TeamWorkConstants.commonRealmURL), objectTypes: [TaskList.self, Task.self])
+    return config
 }
 
 ```
 
-There key tings to note here are how the contnts are layered togetehr to create a set of accessors that allow you to quickly and easily create references to a Realm.  This example shows a single Realm but in more complete projects one could imagine having a number of such accessors created for a number of special purpose Realms.
+There key things to note here are how the contents are layered together to create a set of accessors that allow you to quickly and easily create references to a Realm.  This example shows a single Realm but in more complex projects one could imagine having a number of such accessors created for a number of special purpose Realms.
 
 Next, we'll add the definitions of our models.  Note that there are two kinds of models here: the Task and taskList models.
 
@@ -403,7 +424,7 @@ Then insert the following at the end of the `setupRealm()` function (inside the 
 func setupRealm() {
     DispatchQueue.main.async {
         // Open Realm
-        self.realm = try! Realm(configuration: Constants.tasksRealmConfig)
+        self.realm = try! Realm(configuration: tasksRealmConfig(user: SyncUser.current!))
 
         // Show initial tasks
         func updateList() {
@@ -418,8 +439,8 @@ func setupRealm() {
         self.notificationToken = self.realm.addNotificationBlock { _ in
             updateList()
         }
-    }
-}
+    } // of Dispatch...main
+}// of setupRealm
 ```
 
 And, call this setup function at the end of the `viewDidLoad()` function:

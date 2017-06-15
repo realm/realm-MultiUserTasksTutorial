@@ -31,12 +31,29 @@ struct Constants {
 
     // this is a realm where we can store profile info - not covered in the main line of this tutorial
     static let commonRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/CommonRealm")!
-    static let commonRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: commonRealmURL),objectTypes: [Person.self])
+    
+    // Note: If Swift supported C-style macros, we could simply define the configuration for the tasks Realm like this:
+    //
+    //static let commonRealmConfig    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: commonRealmURL),objectTypes: [Person.self])
+    // However the key bit of information the Realm config needs is which user (e.g., SyncUser) it's being configured with.  As a static
+    // this would get set only once at app launch time -- so if your initial user logs out and someone else tries to log in, the
+    // configuration would still be using the SyncUser.currrent value obtained at launch. So, instead we'll use the function below which
+    // obtains the SyncUser dyanamically.  This same logic appplies to other Realm configs like tasksRealmConfig too.
     
     //  this is a task Realm comptible with the fully version of RealmTasks for iOS/Android/C#
     static let tasksRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/~/realmtasks")!
-    static let tasksRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: tasksRealmURL),objectTypes: [TaskList.self, Task.self])
+    
+    //  static let tasksRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL:    tasksRealmURL),objectTypes: [TaskList.self, Task.self])
+}
 
+func commonRealmConfig(user: SyncUser) -> Realm.Configuration  {
+    let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: Constants.commonRealmURL), objectTypes: [Person.self])
+    return config
+}
+
+func tasksRealmConfig(user: SyncUser) -> Realm.Configuration  {
+    let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: Constants.commonRealmURL), objectTypes: [TaskList.self, Task.self])
+    return config
 }
 
 
@@ -77,7 +94,7 @@ class Person : Object {
     
     
     class func createProfile() -> Person? {
-        let commomRealm =  try! Realm(configuration: Constants.commonRealmConfig)
+        let commomRealm =  try! Realm(configuration: commonRealmConfig(user: SyncUser.current!))
         var profileRecord = commomRealm.objects(Person.self).filter(NSPredicate(format: "id = %@", SyncUser.current!.identity!)).first
         if profileRecord == nil {
             try! commomRealm.write {

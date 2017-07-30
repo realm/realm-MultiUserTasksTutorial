@@ -594,3 +594,5 @@ this code supports the logot button in the TaskTable View navigation controller 
 <center> <img src="/Graphics/Tasks-logout.png"  width="310" height="552" /></center>
 
 ## 13. You're done!
+
+![analytics](https://ga-beacon.appspot.com/UA-50247013-2/realm-MultiUserTasksTutorial/README?pixel)

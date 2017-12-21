@@ -61,11 +61,14 @@ At the terminal, type `pod install` - this will cause the Cocoapods system to fe
 In this seciton we will configure the applicaiton degelgate to support a Navigation controller. From the Project Navigator, double-clock the AppDelegate.swift file and edit the file to replace the `func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions` method with the following:
 
 ```swift
+import UIKit
+
+@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions:[UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = UINavigationController(rootViewController: ViewController(style: .plain))
+        window?.rootViewController = UINavigationController(rootViewController: TasksLoginViewController(style: .plain))
         window?.makeKeyAndVisible()
         return true
     }
@@ -88,36 +91,25 @@ In this section we will set up our login and main view controller's storyboard c
 <center> <img src="/Graphics/Adding-theTableViewController.png" /></center>
 
 
-Once you have added the second view controller, you will need to connect the two controllers by a pair of segues, as well as add class names/storyboard IDs for each controller to prepare for the code will be adding in the next sections:
+Once you have added the second view controller, you will need to add class names/storyboard IDs for each controller to prepare for the code will be adding in the next sections:
 
-1. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears. Select the segue that is created between the two controllers, and set the name of ther segue in the property view on the right side to "loginToTasksViewSegue"
+1. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears.
 
-2. Do the same from the `TasksLoginViewController` back to the `TasksLoginViewController`.  Here, again, tap the newly created segue (it will be the diagonal line) and name this segue "tasksViewToLoginControllerSegue"
-
-3. You will need to set the class names for each of the view controller objects. To do this select the controllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the new TableViewController you added, set the class name to `TasksTableViewController` and here set the storyboard id to `tasksView`. A video summary of these tasks can be seen here:
-
-
-
-<center> <img src="/Graphics/MUTasks-StoryBoardSetup.gif" /></center></br>
-
-
-The final configfuration will look like this:
-
-<center> <img src="/Graphics/final-storyboard-config.png" /></center>
+2. You will need to set the class names for each of the view controller objects. To do this select the controllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the new TableViewController you added, set the class name to `TasksTableViewController` and here set the storyboard id to `tasksView`.
 
 
 ## 5. Configuring the Login View Controller
 
 In this section we will rename and then configure the TasksLoginViewController that will allow you to log in an existing user account, or create a new account
 
-
-1. Open the  `view controller` file in the project naivator. Click once on it to enable editing of the file name; change the name to `TasksLoginViewController` and press return to rename the file.
+1. Open the  `ViewController.swift` file in the project navigator. Click once on it to enable editing of the file name; change the name to `TasksLoginViewController` and press return to rename the file.
 
 2. Clicking on the filename should also have opened the newly renamed file in the editor. Here too you should replace all references to `ViewController` in the comments and class name with `TasksLoginViewController`
 
 3. Next, we are going to update the contents of this view controller and take it from a generic, empty controller to one that can display our Login Panel.
 
 4. Start by modifying the imports to read as follows:
+
     ```swift
     import UIKit
     import RealmSwift
@@ -137,42 +129,51 @@ In this section we will rename and then configure the TasksLoginViewController t
 6. Next, modify the empty `viewWillAppear` method to
 
         ```swift
-        override func viewDidAppear(_ animated: Bool) {
-            loginViewController = LoginViewController(style: .lightOpaque)
-            loginViewController.isServerURLFieldHidden = false
-            loginViewController.isRegistering = true
-
-            if (SyncUser.current != nil) {
-                // yup - we've got a stored session, so just go right to the UITabView
-                Realm.Configuration.defaultConfiguration = commonRealmConfig(user: SyncUser.current!)
-
-                performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
-            } else {
-                // show the RealmLoginKit controller
-                if loginViewController!.serverURL == nil {
-                    loginViewController!.serverURL = Constants.syncAuthURL.absoluteString
-                }
-                // Set a closure that will be called on successful login
-                loginViewController.loginSuccessfulHandler = { user in
-                    DispatchQueue.main.async {
-                        // this AsyncOpen call will open the described Realm and wait for it to download before calling its closure
-                        Realm.asyncOpen(configuration: commonRealmConfig(user: SyncUser.current!)) { realm, error in
-                            if let realm = realm {
-                                Realm.Configuration.defaultConfiguration = commonRealmConfig(user: SyncUser.current!)
-                                self.loginViewController!.dismiss(animated: true, completion: nil)
-                                self.performSegue(withIdentifier: Constants.kLoginToMainView, sender: nil)
-
-                            } else if let error = error {
-                                print("An error occurred while logging in: \(error.localizedDescription)")
-                            }
-                        } // of asyncOpen()
-
-                    } // of main queue dispatch
-                }// of login controller
-
-                present(loginViewController, animated: true, completion: nil)
+    override func viewDidAppear(_ animated: Bool) {
+        loginViewController = LoginViewController(style: .lightOpaque)
+        loginViewController.isServerURLFieldHidden = false
+        loginViewController.isRegistering = true
+        
+        if (SyncUser.current != nil) {
+            // yup - we've got a stored session, so just go right to the UITabView
+            Realm.Configuration.defaultConfiguration = tasksRealmConfig(user: SyncUser.current!)
+            
+            self.navigationController?.setViewControllers([TasksTableViewController()], animated: true)
+            self.loginViewController!.dismiss(animated: true, completion: nil)
+        } else {
+            // show the RealmLoginKit controller
+            if loginViewController!.serverURL == nil {
+                loginViewController!.serverURL = Constants.syncAuthURL.absoluteString
             }
+            // Set a closure that will be called on successful login
+            loginViewController.loginSuccessfulHandler = { user in
+                DispatchQueue.main.async {
+                    // this AsyncOpen call will open the described Realm and wait for it to download before calling its closure
+                    Realm.asyncOpen(configuration: tasksRealmConfig(user: SyncUser.current!)) { realm, error in
+                        if realm != nil {
+                            Realm.Configuration.defaultConfiguration = tasksRealmConfig(user: SyncUser.current!)
+
+                            //self.loginViewController!.dismiss(animated: true, completion: nil)
+                            
+                            // let's instantiate the nexty view controller...
+                            let tasklistVC = TasksTableViewController()
+                            tasklistVC.realm = realm //  and set up its realm reference (since have it).
+                            
+                            // then we can set the nav controller to use this view and then dismiss the login view
+                            self.navigationController?.setViewControllers([tasklistVC], animated: true)
+                            self.loginViewController!.dismiss(animated: true, completion: nil)
+                            
+                        } else if let error = error {
+                            print("An error occurred while logging in: \(error.localizedDescription)")
+                        }
+                    } // of asyncOpen()
+                    
+                } // of main queue dispatch
+            }// of login controller
+            
+            present(loginViewController, animated: true, completion: nil)
         }
+}
         	```
 
 Optionally, commit your progress in source control.

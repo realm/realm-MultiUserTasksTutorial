@@ -544,6 +544,35 @@ Right-click on the `Info.plist` file and select "Open as... Source Code" and pas
 
 ---
 
+
+## Add Notifications
+
+```
+    func setupNotifications() -> NotificationToken? {
+        return self.currentTaskList?.items.observe { [weak self] (changes: RealmCollectionChange) in
+            guard let tableView = self?.tableView else { return }
+            switch changes {
+            case .initial:
+                // Results are now populated and can be accessed without blocking the UI
+                tableView.reloadData()
+            case .update(_, let deletions, let insertions, let modifications):
+                // Query results have changed, so apply them to the UITableView
+                tableView.beginUpdates()
+                tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+                                     with: .automatic)
+                tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+                                     with: .automatic)
+                tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+                                     with: .automatic)
+                tableView.endUpdates()
+            case .error(let error):
+                // An error occurred while opening the Realm file on the background worker thread
+                fatalError("\(error)")
+            }
+        }
+    } // of setupNotifications  
+    ```
+
 If you build and run the app now, it should connect to the object server and display the tasks that were added in RealmTasks earlier.
 
 If you add new tasks by tapping the "Add" button in your app, you should immediately see them reflected in the RealmTasks app too.
@@ -571,44 +600,47 @@ This adds the Edit button to the navigation bar.
 
 Now, add these functions to the `ViewController` class body, right after the other `tableView` functions:
 
-```swift
-override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-    try! items.realm?.write {
-        items.move(from: sourceIndexPath.row, to: destinationIndexPath.row)
-    }
-}
+```
 
-override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-    if editingStyle == .delete {
-          try! realm.write {
-              let item = items[indexPath.row]
-              realm.delete(item)
-          }
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        try! self.items?.realm?.write {
+            self.items?.move(from: sourceIndexPath.row, to: destinationIndexPath.row)
+        }
     }
-}
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            try! realm.write {
+                let item = self.items?[indexPath.row]
+                realm.delete(item!)
+            }
+        }
+    }
 ```
 
 ## 11. Support toggling the 'completed' state of a task by tapping it
 
 After the last `tableView` function in the `ViewController` class, add the following function override:
 
-```swift
-override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let item = items[indexPath.row]
-    try! item.realm?.write {
-        item.completed = !item.completed
-        let destinationIndexPath: IndexPath
-        if item.completed {
-            // move cell to bottom
-            destinationIndexPath = IndexPath(row: items.count - 1, section: 0)
-        } else {
-            // move cell just above the first completed item
-            let completedCount = items.filter("completed = true").count
-            destinationIndexPath = IndexPath(row: items.count - completedCount - 1, section: 0)
+```
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let item = items![indexPath.row]
+        try! item.realm?.write {
+            item.completed = !item.completed
+            let destinationIndexPath: IndexPath
+            if item.completed {
+                // move cell to bottom
+                destinationIndexPath = IndexPath(row: items!.count - 1, section: 0)
+            } else {
+                // move cell just above the first completed item
+                let completedCount = items!.filter("completed = true").count
+                destinationIndexPath = IndexPath(row: items!.count - completedCount - 1, section: 0)
+            }
+            self.items!.move(from: indexPath.row, to: destinationIndexPath.row)
         }
-        items.move(from: indexPath.row, to: destinationIndexPath.row)
     }
-}
+    
 ```
 
 
@@ -616,30 +648,31 @@ override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: Inde
 
 In this section we're going to add a logoout capability
 Add the following two methods to the bottom of the TaskViewController class
-```swift
+```
+
 // Logout Support
-
-
-@IBAction  func handleLogout(sender:AnyObject?) {
-    let alert = UIAlertController(title: NSLocalizedString("Logout", comment: "Logout"), message: NSLocalizedString("Really Log Out?", comment: "Really Log Out?"), preferredStyle: .alert)
-
-    // Logout button
-    let OKAction = UIAlertAction(title: NSLocalizedString("Logout", comment: "logout"), style: .default) { (action:UIAlertAction!) in
-        SyncUser.current?.logOut()
-        //Now we need to segue to the login view controller
-        self.performSegue(withIdentifier: Constants.kExitToLoginViewSegue, sender: self)
+    
+    
+    @IBAction  func handleLogout(sender:AnyObject?) {
+        let alert = UIAlertController(title: NSLocalizedString("Logout", comment: "Logout"), message: NSLocalizedString("Really Log Out?", comment: "Really Log Out?"), preferredStyle: .alert)
+        
+        // Logout button
+        let OKAction = UIAlertAction(title: NSLocalizedString("Logout", comment: "logout"), style: .default) { (action:UIAlertAction!) in
+            SyncUser.current?.logOut()
+            self.navigationController?.setViewControllers([TasksLoginViewController()], animated: true)
+        }
+        alert.addAction(OKAction)
+        
+        // Cancel button
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction!) in
+            print("Cancel button tapped");
+        }
+        alert.addAction(cancelAction)
+        
+        // Present Dialog message
+        present(alert, animated: true, completion:nil)
     }
-    alert.addAction(OKAction)
 
-    // Cancel button
-    let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction!) in
-        print("Cancel button tapped");
-    }
-    alert.addAction(cancelAction)
-
-    // Present Dialog message
-    present(alert, animated: true, completion:nil)
-}
 ```
 
 this code supports the logot button in the TaskTable View navigation controller and will log theuser out and take them back to the RealmLoginKit panel.

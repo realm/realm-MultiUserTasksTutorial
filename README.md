@@ -128,7 +128,7 @@ In this section we will rename and then configure the TasksLoginViewController t
 
 6. Next, modify the empty `viewWillAppear` method to
 
-        ```swift
+        ```
     override func viewDidAppear(_ animated: Bool) {
         loginViewController = LoginViewController(style: .lightOpaque)
         loginViewController.isServerURLFieldHidden = false

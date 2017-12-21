@@ -41,7 +41,7 @@ Open a Terminal window and change to the directory/folder where you created the 
 
 If you have not already done so, install the Cocoapods system 
 
-Full details are available via the Cocopods site, but the simplest instructions are to type sudo gem install cocoapods in a terminal window
+Full details are available via the Cocopods site, but the simplest instructions are to type `sudo gem install cocoapods` in a terminal window
 
 Initialize a new Cocoapods Podfile with pod init A new file called Podfile will be created.
 

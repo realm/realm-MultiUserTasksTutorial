@@ -80,24 +80,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 In this section we will set up our login and main view controller's storyboard connections.
 
-1. Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use the newly created `MultiUserRealmTasksTutorial.xcworkspace` file; this was created by the Cocoapods dependency manager and should be used going forward
-
-2. If you have not already, open the `MultiUserRealmTasksTutorial.xcworkspace` with Xcode.
-
-3. In the Xcode project navigator select the `main.storyboard` file. Interface builder (IB) will open and show the default single view layout:
+1. In the Xcode project navigator select the `main.storyboard` file. Interface builder (IB) will open and show the default single view layout:
 
 <center><img src="/Graphics/InterfaceBuilder-start.png"> 	</center>
 
-3. Adding the TableViewController - on the lower right of the window is the object browser, type "tableview" to narrow down the possible IB objects. There will be a "TableView Controller" object visible. Drag this onto the canvas. Once you have done this the Storyboard view will resemble this:
+2. Adding the TableViewController - on the lower right of the window is the object browser, type "tableview" to narrow down the possible IB objects. There will be a "TableView Controller" object visible. Drag this onto the canvas. Once you have done this the Storyboard view will resemble this:
 
 <center> <img src="/Graphics/Adding-theTableViewController.png" /></center>
 
 
 Once you have added the second view controller, you will need to add class names/storyboard IDs for each controller to prepare for the code will be adding in the next sections:
 
-1. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears.
+3. Open the storyboard propery viewer to see the ourline view of the contents of both controllers in the sotoryboard. Then, control-drag from the TasksLoginViewController label to the Table View Controller label and select "show" when the popup menu appears.
 
-2. You will need to set the class names for each of the view controller objects. To do this select the controllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the new TableViewController you added, set the class name to `TasksTableViewController` and here set the storyboard id to `tasksView`.
+4. You will need to set the class names for each of the view controller objects. To do this select the controllers one at a time, and for the LoginView Controller, set the class name to `TasksLoginViewController` and to the storyboard id to `loginView`.  For the new TableViewController you added, set the class name to `TasksTableViewController` and here set the storyboard id to `tasksView`.
 
 
 ## 5. Configuring the Login View Controller

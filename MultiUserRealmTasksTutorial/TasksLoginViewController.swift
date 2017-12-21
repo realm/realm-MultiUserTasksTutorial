@@ -45,8 +45,15 @@ class TasksLoginViewController: UITableViewController {
                     Realm.asyncOpen(configuration: tasksRealmConfig(user: SyncUser.current!)) { realm, error in
                         if realm != nil {
                             Realm.Configuration.defaultConfiguration = tasksRealmConfig(user: SyncUser.current!)
-                            self.loginViewController!.dismiss(animated: true, completion: nil)
-                            self.navigationController?.setViewControllers([TasksTableViewController()], animated: true)
+
+                            //self.loginViewController!.dismiss(animated: true, completion: nil)
+                            
+                            // let's instantiate the nexty view controller...
+                            let tasklistVC = TasksTableViewController()
+                            tasklistVC.realm = realm //  and set up its realm reference (since have it).
+                            
+                            // then we can set the nav controller to use this view and then dismiss the login view
+                            self.navigationController?.setViewControllers([tasklistVC], animated: true)
                             self.loginViewController!.dismiss(animated: true, completion: nil)
                             
                         } else if let error = error {

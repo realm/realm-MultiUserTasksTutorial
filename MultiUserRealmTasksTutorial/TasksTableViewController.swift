@@ -31,8 +31,10 @@ class TasksTableViewController: UITableViewController {
         //let screenSize: CGRect = UIScreen.main.bounds
         //let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
         //let navItem = UINavigationItem(title: "")
+        
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
         let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
+        
         //navItem.rightBarButtonItems =  [addButton, logoutButton]
         //navItem.leftBarButtonItem = editButtonItem
         //navBar.setItems([navItem], animated: false)
@@ -70,15 +72,35 @@ class TasksTableViewController: UITableViewController {
             }
         }
         
-        // Now, get all of our tasks, if any.  On return, we'll check to see if the list is empty
-        // and make a prototype 1st task for the user so they're not looking ast a blank screen.
+        // Now, get all of our tasks, if any.
         self.items = self.currentTaskList?.items // NB: this will return an empty list if there are no tasks
         
         // and, finally, let's listen for changes to the task items
         self.notificationToken = self.setupNotifications()
 
     }// of setupRealm
-    
+
+//    func SavedsetupRealm() {
+//        DispatchQueue.main.async {
+//            // Open Realm
+//            self.realm = try! Realm(configuration: tasksRealmConfig(user: SyncUser.current!))
+//
+//            // Show initial tasks
+//            func updateList() {
+//                if self.items.realm == nil, let list = self.realm.objects(TaskList.self).first {
+//                    self.items = list.items
+//                }
+//                self.tableView.reloadData()
+//            }
+//            updateList()
+//
+//            // Notify us when Realm changes
+//            self.notificationToken = self.realm.observe { _,_ in
+//                updateList()
+//            }
+//        } // of Dispatch...main
+//    }// of setupRealm
+
     
     func setupNotifications() -> NotificationToken? {
         return self.currentTaskList?.items.observe { [weak self] (changes: RealmCollectionChange) in
@@ -105,29 +127,6 @@ class TasksTableViewController: UITableViewController {
     } // of setupNotifications
     
     
-    
-//    func SavedsetupRealm() {
-//        DispatchQueue.main.async {
-//            // Open Realm
-//            self.realm = try! Realm(configuration: tasksRealmConfig(user: SyncUser.current!))
-//
-//            // Show initial tasks
-//            func updateList() {
-//                if self.items.realm == nil, let list = self.realm.objects(TaskList.self).first {
-//                    self.items = list.items
-//                }
-//                self.tableView.reloadData()
-//            }
-//            updateList()
-//
-//            // Notify us when Realm changes
-//            self.notificationToken = self.realm.observe { _,_ in
-//                updateList()
-//            }
-//        } // of Dispatch...main
-//    }// of setupRealm
-    
-    
     deinit {
         notificationToken?.invalidate()
     }
@@ -150,13 +149,11 @@ class TasksTableViewController: UITableViewController {
          return self.items!.count
     }
     
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let item = self.items![indexPath.row]
         cell.textLabel?.text = item.text
         cell.textLabel?.alpha = item.completed ? 0.5 : 1
-        print("working on cell for row: \(indexPath.row), text is \"\(item.text)\"")
         return cell
     }
     

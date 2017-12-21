@@ -543,10 +543,10 @@ Right-click on the `Info.plist` file and select "Open as... Source Code" and pas
 ---
 
 
-## Add Notifications
+## 10. Add Notifications
 
 ```
-    func setupNotifications() -> NotificationToken? {
+func setupNotifications() -> NotificationToken? {
         return self.currentTaskList?.items.observe { [weak self] (changes: RealmCollectionChange) in
             guard let tableView = self?.tableView else { return }
             switch changes {
@@ -582,7 +582,7 @@ If you add new tasks by tapping the "Add" button in your app, you should immedia
 
 Keep going if you'd like to see how easy it is to add more functionality and finish building your task management app.
 
-## 10. Support moving and deleting tasks
+## 11. Support moving and deleting tasks
 
 Add the following right after the `navItem.rightBarButtonItems` like in your `setupUI()` function:
 
@@ -616,7 +616,7 @@ Now, add these functions to the `ViewController` class body, right after the oth
     }
 ```
 
-## 11. Support toggling the 'completed' state of a task by tapping it
+## 12. Support toggling the 'completed' state of a task by tapping it
 
 After the last `tableView` function in the `ViewController` class, add the following function override:
 
@@ -642,7 +642,7 @@ After the last `tableView` function in the `ViewController` class, add the follo
 ```
 
 
-## 12. Adding a Logout Capabilities
+## 13. Adding a Logout Capabilities
 
 In this section we're going to add a logoout capability
 Add the following two methods to the bottom of the TaskViewController class
@@ -678,6 +678,6 @@ this code supports the logot button in the TaskTable View navigation controller 
 
 <center> <img src="/Graphics/Tasks-logout.png"  width="310" height="552" /></center>
 
-## 13. You're done!
+## 14. You're done!
 
 ![analytics](https://ga-beacon.appspot.com/UA-50247013-2/realm-MultiUserTasksTutorial/README?pixel)

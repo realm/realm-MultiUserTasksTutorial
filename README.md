@@ -25,8 +25,6 @@ Enter "MultiUserRealmTasksTutorial" in the "Product Name" field.
 
 Select "Swift" from the "Language" dropdown menu.
 
-Select "iPhone" from the "Devices" dropdown menu.
-
 Select your team name (log in via Xcode's preferences, if necessary) and enter an organization name.
 
 Click "Next", then select a location on your Mac to create this project, then click "Create".
@@ -58,7 +56,11 @@ Save the file
 At the terminal, type `pod install` - this will cause the Cocoapods system to fetch the RealmSwift and RealmLoginKit modules, as well as create a new Xcode workspace file which enabled these modules to be used in this project.
 
 ## 3. Setting up the Application Delegate
-In this seciton we will configure the applicaiton degelgate to support a Navigation controller. From the Project Navigator, double-clock the AppDelegate.swift file and edit the file to replace the `func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions` method with the following:
+In this section we will configure the application delegate to support a Navigation controller. 
+
+Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use the newly created `MultiUserRealmTasksTutorial.xcworkspace` file; this was created by the Cocoapods dependency manager and should be used going forward.
+
+From the Project Navigator, double-click the AppDelegate.swift file and edit the file to replace the `func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions` method with the following:
 
 ```swift
 import UIKit

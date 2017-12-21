@@ -545,7 +545,7 @@ Right-click on the `Info.plist` file and select "Open as... Source Code" and pas
 
 ## 10. Add Notifications
 
-```
+```swift
 func setupNotifications() -> NotificationToken? {
         return self.currentTaskList?.items.observe { [weak self] (changes: RealmCollectionChange) in
             guard let tableView = self?.tableView else { return }
@@ -569,7 +569,7 @@ func setupNotifications() -> NotificationToken? {
             }
         }
     } // of setupNotifications  
-    ```
+```
 
 If you build and run the app now, it should connect to the object server and display the tasks that were added in RealmTasks earlier.
 

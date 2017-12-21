@@ -55,6 +55,7 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
         DispatchQueue.main.async {
             // Open Realm
             self.realm = try! Realm(configuration: tasksRealmConfig(user: SyncUser.current!))
+            print(self.realm)
             
             // Show initial tasks
             func updateList() {
@@ -66,8 +67,9 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
             updateList()
             
             // Notify us when Realm changes
-            self.notificationToken = self.realm.addNotificationBlock { _ in
+            self.notificationToken = self.realm.observe{realm in
                 updateList()
+                print("here in notifications")
             }
         } // of Dispatch...main
     }// of setupRealm
@@ -172,6 +174,7 @@ class TasksTableViewController: UITableViewController,  UIGestureRecognizerDeleg
             try! realm.write {
                 let item = items[indexPath.row]
                 realm.delete(item)
+                print("here in writes")
             }
         }
     }

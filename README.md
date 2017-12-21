@@ -2,51 +2,60 @@
 
 This tutorial will guide you through writing an iOS app using Realm Swift to sync with the RealmTasks demo apps.
 
+In order to successfully complete this tutorial you will need a Macintosh running macOS 10.12 or later, as well as a copy of Xcode 9.2
+
 The rest of this tutorial will show you how to:
-  1. Setup a new Realm-based project from scratch using Cocoapods
-  2. How to adopt and setup a free Realm utility module called `RealmLoginKit` which allows you to easily created multi-user ready applications with almost zero coding
-  3. How to create a simple Realm-based Task Manager that can interoperate with the fully-featured RealmTasks that comes with the Realm Mobile Platform distribution
 
-In order to successfuly complete this tutorial you will need a Macintosh running macOS 10.12 or later, as well as a copy of Xcode 8.2.3 or later.
+Setup a new Realm-based project from scratch using Cocoapods
 
-First, [install the MacOS bundle](get-started/installation/mac) if you haven't yet. This will get you set up with the Realm Mobile Platform including a local copy of the Realm Object Server and let you launch the macOS version of RealmTasks.
+How to adopt and setup a free Realm utility module called RealmLoginKit which allows you to easily created multi-user ready applications with almost zero coding
 
-Unless you have already have the Realm Object Server running, you will need to navigate to the downloads folder, open the Realm Object Server folder and double-click on the `start-object-server.command` file. This will start the local copy of the Realm Object Server.  After a few moments your browser will open and you will be prompted to create a new admin account and register your copy of the server.  Once you have completed this setup step, you will be ready to being the Realm Tasks tutorial, below.
+How to create a simple Realm-based Task Manager that can interoperate with the fully-featured RealmTasks that comes with the Realm Mobile Platform distribution
 
 ## 1. Create a new Xcode project
-
 In this section we will create the basic iOS iPhone application skeleton needed for this tutorial.
 
-1. Launch Xcode 8.
-2. Click "Create a new Xcode project".
-3. Select "iOS", then "Application", then "Single View Application", then click "Next".
-4. Enter "MultiUserRealmTasksTutorial" in the "Product Name" field.
-5. Select "Swift" from the "Language" dropdown menu.
-6. Select "iPhone" from the "Devices" dropdown menu.
-7. Select your team name (log in via Xcode's preferences, if necessary) and enter an organization name.
-8. Click "Next", then select a location on your Mac to create this project, then click "Create".
+Launch Xcode 9.
+
+Click "Create a new Xcode project".
+
+Select "iOS", then "Application", then "Single View Application", then click "Next".
+
+Enter "MultiUserRealmTasksTutorial" in the "Product Name" field.
+
+Select "Swift" from the "Language" dropdown menu.
+
+Select "iPhone" from the "Devices" dropdown menu.
+
+Select your team name (log in via Xcode's preferences, if necessary) and enter an organization name.
+
+Click "Next", then select a location on your Mac to create this project, then click "Create".
 
 ## 2. Setting Up Cocoapods
 
 In this section we set up the Cocoapod dependency manager and add Realm's Swift bindings and a utility module that allows us to create a multi-user application using a preconfigured login panel
 
-1. Quit Xcode
-2. Open a Terminal window and change to the directory/folder where you created the Xcode _RealmTasksTutorial_ project
-2. If you have not already done so, install the [Cocoapods system](https://cocoapods.org/)
-	 - Full details are available via the Cocopods site, but the simplest instructions are to type ``sudo gem install cocoapods`` in a terminal window
-3. Initialize a new Cocoapods Podfile with ```pod init```  A new file called `Podfile` will be created.
-4. Edit the Podfile,  find the the comment line that reads:
+Quit Xcode
 
-  ` # Pods for MultiUserRealmTasksTutorial`
-	 And add the following after this line:
+Open a Terminal window and change to the directory/folder where you created the Xcode RealmTasksTutorialproject
 
-    ```ruby
-    pod 'RealmSwift'
-    pod 'RealmLoginKit'
-    ```
+If you have not already done so, install the Cocoapods system 
 
-5. Save the file
-6. At the terminal, type `pod install` - this will cause the Cocoapods system to fetch the RealmSwift and RealmLoginKit modules, as well as create a new Xcode workspace file which enabled these modules to be used in this project.
+Full details are available via the Cocopods site, but the simplest instructions are to type sudo gem install cocoapods in a terminal window
+
+Initialize a new Cocoapods Podfile with pod init A new file called Podfile will be created.
+
+Edit the Podfile, find the the comment line that reads:
+
+# Pods for MultiUserRealmTasksTutorial And add the following after this line:
+```
+pod 'RealmSwift'
+pod 'RealmLoginKit'
+```
+
+Save the file
+
+At the terminal, type `pod install` - this will cause the Cocoapods system to fetch the RealmSwift and RealmLoginKit modules, as well as create a new Xcode workspace file which enabled these modules to be used in this project.
 
 ## 3. Setting up the Application Delegate
 In this seciton we will configure the applicaiton degelgate to support a Navigation controller. From the Project Navigator, double-clock the AppDelegate.swift file and edit the file to replace the `func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions` method with the following:

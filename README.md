@@ -63,18 +63,14 @@ Reopen Xcode, but rather than open `MultiUserRealmTasksTutorial.xcodeproj` use t
 From the Project Navigator, double-click the AppDelegate.swift file and edit the file to replace the `func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions` method with the following:
 
 ```swift
-import UIKit
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions:[UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = UINavigationController(rootViewController: TasksLoginViewController(style: .plain))
         window?.makeKeyAndVisible()
         return true
     }
-}
+    
 ```
 ## 4. Setting Up the Storyboard & Views
 
@@ -125,7 +121,7 @@ In this section we will rename and then configure the TasksLoginViewController t
 
     ```
 
-6. Next, modify the empty `viewWillAppear` method to
+6. Next, create the `viewWillAppear` method to
 
  ```
         override func viewDidAppear(_ animated: Bool) {
@@ -182,12 +178,9 @@ In this section we will rename and then configure the TasksLoginViewController t
 ## 6. Create the Models and Constants Class File
 In this step we are going to create a few constants to help us manage our Realm as well as the class models our Realm will operate on.
 
-From the Project Navigator, right click and select `New File` and when the file selector apprears select `Swift File` and name the file `ConstantsAndModels` and press preturn.  Xcode will create a new Swift file and open it in the editor.
+From the Project Navigator, right click and select `New File` and when the file selector apprears select `Swift File` and name the file `ConstantsAndModels` and press return.  Xcode will create a new Swift file and open it in the editor.
 
-Our first task will be to create some contants that will make opeing and working with Realms easier, then we will define the Task models.  o do this add the following code to the f
-
-
-Let's start with the Contants; add the following  to the file:
+Let's start with the Constants; add the following  to the file:
 
 ```
 
@@ -397,6 +390,8 @@ open override var prefersStatusBarHidden : Bool {
 
 ```
 
+Note: There is an existing `override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int)` from our Xcode template that you will need to delete.  
+
 If you then build and run the app, you'll see your one task being displayed in the table. There's also some code in here to show completed items as a little lighter than uncompleted items, but we won't see that in action until later.
 
 ## 8. Add support for creating new tasks
@@ -466,7 +461,6 @@ Now, add the following properties to your `ViewController` class, just under the
 
 ```
 var notificationToken: NotificationToken!
-var realm: Realm!
 ```
 
 The notification token we just added will be needed when we start observing changes from the Realm.
@@ -477,11 +471,11 @@ Right after the end of the `setupUI()` function, add the following:
 
 ```swift
 deinit {
-    notificationToken.stop()
+    notificationToken.invalidate()
 }
 ```
 
-Then insert the following at the end of the `setupRealm()` function (inside the function body):
+Then insert the following below the `setupUI()` function:
 
 ```
 func setupRealm() {

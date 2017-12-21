@@ -29,15 +29,18 @@ class TasksTableViewController: UITableViewController {
         
         // we don't have a UINavigationController so let's add a hand-constructed UINavBar
         let screenSize: CGRect = UIScreen.main.bounds
-        let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
-        let navItem = UINavigationItem(title: "")
+        //let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
+        //let navItem = UINavigationItem(title: "")
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
         let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
-        navItem.rightBarButtonItems =  [addButton, logoutButton]
-        navItem.leftBarButtonItem = editButtonItem
-        navBar.setItems([navItem], animated: false)
+        //navItem.rightBarButtonItems =  [addButton, logoutButton]
+        //navItem.leftBarButtonItem = editButtonItem
+        //navBar.setItems([navItem], animated: false)
+        //self.view.addSubview(navBar)
         
-        self.view.addSubview(navBar)
+        self.navigationItem.rightBarButtonItems = [addButton, logoutButton]
+        self.navigationItem.leftBarButtonItem = editButtonItem
+
     }
     
     

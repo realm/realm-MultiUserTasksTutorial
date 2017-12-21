@@ -309,9 +309,12 @@ class Person : Object {
 At this point, we've created a login system, and defined the data models (`Task` and `TaskList`) that we'll use to represent our data and sync with the RealmTasks apps.
 
 
+
 Your app should now build and run---although so far it doesn't do much, it will show you to login panel you just configured:
 
 <center> <img src="/Graphics/TaskLoginView.png"  width="310" height="552" /></center>
+
+NOPE DOES NOT RUN YET BECAUSE WE HAVE NOT DEFINED THE OTHER VC
 
 
 Click the stop button to terminate the app, and we will continue with the rest of the changes needed to create our Realm Tasks app.
@@ -333,23 +336,27 @@ Xcode will open the file and we can now start configuring this view controller b
 
 Use a Realm List to references Tasks in the table view:
 
-Add the following property to your `ViewController` class, on a new line, right after the class declaration:
+Add the following property to your `TasksTableViewController` class, on a new line, right after the class declaration:
 
-```swift
-var items = List<Task>()
+```
+    var realm:          Realm!
+    var items:          List<Task>?         // all of the tasks
+    var myTaskLists:    Results<TaskList>?  // all tasks lists
+    var currentTaskList: TaskList?          // the current list we're watching
 ```
 
 Next, we'll have a method that configures the Table View when the controller loads.  Edit the `ViewDidLoad` method as follows:
 
-```swift
+```
 override func viewDidLoad() {
     super.viewDidLoad()
     setupUI()
 }
 
+
 func setupUI() {
-  se;f
-    title = "My Tasks"
+  
+    self.title = "My Tasks"
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
 }
 ```
@@ -357,16 +364,16 @@ func setupUI() {
 
 Add the following line to the end of your `viewDidLoad()` function to seed the list with some initial data:
 
-```swift
+```
 override func viewDidLoad() {
     // ... existing function ...
     items.append(Task(value: ["text": "My First Task"]))
 }
 ```
 
-Append the following to the end of your `ViewController` class's body:
+Append the following to the end of your `TasksTableViewController` class's body:
 
-```swift
+```
 
 // MARK: Turn off the staus bar
 
@@ -377,17 +384,19 @@ open override var prefersStatusBarHidden : Bool {
 
 // MARK: UITableView
 
-override func tableView(_ tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-    return items.count
-}
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+         return self.items!.count
+    }
 
-override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-    let item = items[indexPath.row]
-    cell.textLabel?.text = item.text
-    cell.textLabel?.alpha = item.completed ? 0.5 : 1
-    return cell
-}
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let item = self.items![indexPath.row]
+        cell.textLabel?.text = item.text
+        cell.textLabel?.alpha = item.completed ? 0.5 : 1
+        print("working on cell for row: \(indexPath.row), text is \"\(item.text)\"")
+        return cell
+    }
+
 ```
 
 If you then build and run the app, you'll see your one task being displayed in the table. There's also some code in here to show completed items as a little lighter than uncompleted items, but we won't see that in action until later.
@@ -396,59 +405,68 @@ If you then build and run the app, you'll see your one task being displayed in t
 
 Delete the line in your `viewDidLoad()` function that seeded initial data:
 
-```swift
+```
 override func viewDidLoad() {
     // -- DELETE THE FOLLOWING LINE --
     items.append(Task(value: ["text": "My First Task"]))
 }
 ```
 
-Add the following function to your `ViewController` class at its end:
+Add the following function to your `TasksTableViewController` class at its end:
 
-```swift
-// MARK: Functions
-
-func add() {
-    let alertController = UIAlertController(title: "New Task", message: "Enter Task Name", preferredStyle: .alert)
-    var alertTextField: UITextField!
-    alertController.addTextField { textField in
-        alertTextField = textField
-        textField.placeholder = "Task Name"
+```
+    // MARK: Functions
+    
+    @objc func add() {
+        let alertController = UIAlertController(title: "New Task", message: "Enter Task Name", preferredStyle: .alert)
+        var alertTextField: UITextField!
+        alertController.addTextField { textField in
+            alertTextField = textField
+            textField.placeholder = "Task Name"
+        }
+        alertController.addAction(UIAlertAction(title: "Add", style: .default) { _ in
+            guard let text = alertTextField.text , !text.isEmpty else { return }
+            
+            let items = self.items
+            try! items?.realm?.write {
+                items!.insert(Task(value: ["text": text]), at: items!.filter("completed = false").count)
+            }
+        })
+        present(alertController, animated: true, completion: nil)
     }
-    alertController.addAction(UIAlertAction(title: "Add", style: .default) { _ in
-        guard let text = alertTextField.text , !text.isEmpty else { return }
-
-        self.items.append(Task(value: ["text": text]))
-        self.tableView.reloadData()
-    })
-    present(alertController, animated: true, completion: nil)
-}
+    
 ```
 
-Now add the following line at the end of the `setupUI()` function:
+Now make your  `setupUI()` function:
 
-```swift
+```
 func setupUI() {
-    // ... existing function ...
+        title = "My Tasks"
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        
+        // we don't have a UINavigationController so let's add a hand-constructed UINavBar
+        let screenSize: CGRect = UIScreen.main.bounds
+        //let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
+        //let navItem = UINavigationItem(title: "")
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+        let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
+        //navItem.rightBarButtonItems =  [addButton, logoutButton]
+        //navItem.leftBarButtonItem = editButtonItem
+        //navBar.setItems([navItem], animated: false)
+        //self.view.addSubview(navBar)
+        
+        self.navigationItem.rightBarButtonItems = [addButton, logoutButton]
+        self.navigationItem.leftBarButtonItem = editButtonItem
 
-    // we don't have a UINavigationController so let's add a hand-constructed UINavBar
-    let screenSize: CGRect = UIScreen.main.bounds
-    let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
-    let navItem = UINavigationItem(title: "")
-    let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
-    let logoutButton = UIBarButtonItem(title: NSLocalizedString("Logout", comment:"logout"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleLogout))
-    navItem.leftBarButtonItem = editButtonItem
-    navBar.setItems([navItem], animated: false)
-
-    self.view.addSubview(navBar)
-}
+    }
+    
 ```
 
 ## 9. Back items by a Realm and integrate sync
 
 Now, add the following properties to your `ViewController` class, just under the `items` property:
 
-```swift
+```
 var notificationToken: NotificationToken!
 var realm: Realm!
 ```
@@ -465,65 +483,52 @@ deinit {
 }
 ```
 
-In the code above, enter the same values for the `username` and `password` variables as you used when registering a user through the RealmTasks app in the "Getting Started" steps.
-
 Then insert the following at the end of the `setupRealm()` function (inside the function body):
 
-```swift
+```
 func setupRealm() {
-    DispatchQueue.main.async {
-        // Open Realm
-        self.realm = try! Realm(configuration: tasksRealmConfig(user: SyncUser.current!))
-
-        // Show initial tasks
-        func updateList() {
-            if self.items.realm == nil, let list = self.realm.objects(TaskList.self).first {
-                self.items = list.items
+        // Open the Realm, if necessary - it's probably been passed in to us
+        // by the login mechanism which did an realm.asyncOpen()
+        if self.realm == nil {
+            self.realm = try! Realm(configuration: tasksRealmConfig(user: SyncUser.current!))
+        }
+        
+        // Next, let's get all of our task lists, and then we'll set the default to the first one
+        // (of course if there are not, in fact, any taks lists, we'll make one)
+        self.myTaskLists = self.realm.objects(TaskList.self)
+        if self.myTaskLists!.count > 0 {
+            self.currentTaskList = self.myTaskLists!.first
+        } else {
+            try! realm.write {
+                let initialValues = ["id": NSUUID().uuidString, "text": "My First Task List"]
+                let newTaskList = realm.create(TaskList.self, value: initialValues)
+                self.currentTaskList = newTaskList
+                
+                let values =  ["text": "My First Task"]
+                let newTask = realm.create(Task.self, value: values)
+                realm.add(newTask) // add the new tasks
+                self.currentTaskList?.items.append(newTask) // and add it to our default list
             }
-            self.tableView.reloadData()
         }
-        updateList()
+        
+        // Now, get all of our tasks, if any.  On return, we'll check to see if the list is empty
+        // and make a prototype 1st task for the user so they're not looking ast a blank screen.
+        self.items = self.currentTaskList?.items // NB: this will return an empty list if there are no tasks
+        
+        // and, finally, let's listen for changes to the task items
+        self.notificationToken = self.setupNotifications()
 
-        // Notify us when Realm changes
-        self.notificationToken = self.realm.addNotificationBlock { _ in
-            updateList()
-        }
-    } // of Dispatch...main
-}// of setupRealm
+    }// of setupRealm
 ```
 
 And, call this setup function at the end of the `viewDidLoad()` function:
 
-```swift
+```
 override func viewDidLoad() {
     // ... existing function ...
     setupRealm()
 }
 ```
-
-Now edit the `add()` function to look like this:
-
-```swift
-func add() {
-    let alertController = UIAlertController(title: "New Task", message: "Enter Task Name", preferredStyle: .alert)
-    var alertTextField: UITextField!
-    alertController.addTextField { textField in
-        alertTextField = textField
-        textField.placeholder = "Task Name"
-    }
-    alertController.addAction(UIAlertAction(title: "Add", style: .default) { _ in
-        guard let text = alertTextField.text , !text.isEmpty else { return }
-
-        let items = self.items
-        try! items.realm?.write {
-            items.insert(Task(value: ["text": text]), at: items.filter("completed = false").count)
-        }
-    })
-    present(alertController, animated: true, completion: nil)
-}
-```
-
-This deletes two lines in the `guard` block that begin with `self.` and replaces them with a `let` and `try!` block which will actually write a new task to the Realm.
 
 Lastly, we need to allow non-TLS network requests to talk to our local sync server.
 

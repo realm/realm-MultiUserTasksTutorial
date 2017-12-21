@@ -1,24 +1,26 @@
 //
-//  ViewController.swift
+//  TasksLoginViewController.swift
 //  MultiUserRealmTasksTutorial
 //
-//  Created by David Spector on 6/6/17.
-//  Copyright © 2017 Realm. All rights reserved.
+//  Created by Ian Ward on 12/19/17.
+//  Copyright © 2017 Ian Ward. All rights reserved.
 //
-
 import UIKit
 import RealmSwift
 import RealmLoginKit
 
-class TasksLoginViewController: UIViewController {
+class TasksLoginViewController: UITableViewController {
     var loginViewController: LoginViewController!
     var token: NotificationToken!
-
+    var myIdentity = SyncUser.current?.identity!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        // Do any additional setup after loading the view.
     }
-
+    
     
     override func viewDidAppear(_ animated: Bool) {
         loginViewController = LoginViewController(style: .lightOpaque)
@@ -27,9 +29,10 @@ class TasksLoginViewController: UIViewController {
         
         if (SyncUser.current != nil) {
             // yup - we've got a stored session, so just go right to the UITabView
-            Realm.Configuration.defaultConfiguration = commonRealmConfig(user: SyncUser.current!)
+            Realm.Configuration.defaultConfiguration = tasksRealmConfig(user: SyncUser.current!)
             
-            performSegue(withIdentifier: Constants.kLoginToMainView, sender: self)
+            self.navigationController?.setViewControllers([TasksTableViewController()], animated: true)
+            self.loginViewController!.dismiss(animated: true, completion: nil)
         } else {
             // show the RealmLoginKit controller
             if loginViewController!.serverURL == nil {
@@ -39,11 +42,12 @@ class TasksLoginViewController: UIViewController {
             loginViewController.loginSuccessfulHandler = { user in
                 DispatchQueue.main.async {
                     // this AsyncOpen call will open the described Realm and wait for it to download before calling its closure
-                    Realm.asyncOpen(configuration: commonRealmConfig(user: SyncUser.current!)) { realm, error in
-                        if let realm = realm {
-                            Realm.Configuration.defaultConfiguration = commonRealmConfig(user: SyncUser.current!)
+                    Realm.asyncOpen(configuration: tasksRealmConfig(user: SyncUser.current!)) { realm, error in
+                        if realm != nil {
+                            Realm.Configuration.defaultConfiguration = tasksRealmConfig(user: SyncUser.current!)
                             self.loginViewController!.dismiss(animated: true, completion: nil)
-                            self.performSegue(withIdentifier: Constants.kLoginToMainView, sender: nil)
+                            self.navigationController?.setViewControllers([TasksTableViewController()], animated: true)
+                            self.loginViewController!.dismiss(animated: true, completion: nil)
                             
                         } else if let error = error {
                             print("An error occurred while logging in: \(error.localizedDescription)")
@@ -55,14 +59,6 @@ class TasksLoginViewController: UIViewController {
             
             present(loginViewController, animated: true, completion: nil)
         }
-    }
-
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
 }
 
+}

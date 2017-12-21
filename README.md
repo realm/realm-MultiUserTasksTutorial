@@ -118,7 +118,8 @@ In this section we will rename and then configure the TasksLoginViewController t
 
 5. Modify the top of the class file so the following properties are declared:
 
-    ```swift
+    ```
+    
     class TasksLoginViewController: UITableViewController {
     var loginViewController: LoginViewController!
     var token: NotificationToken!
@@ -128,7 +129,7 @@ In this section we will rename and then configure the TasksLoginViewController t
 
 6. Next, modify the empty `viewWillAppear` method to
 
-        ```
+ ```
         override func viewDidAppear(_ animated: Bool) {
         loginViewController = LoginViewController(style: .lightOpaque)
         loginViewController.isServerURLFieldHidden = false
@@ -174,6 +175,7 @@ In this section we will rename and then configure the TasksLoginViewController t
             present(loginViewController, animated: true, completion: nil)
         }
 } 
+
 ```
 
 Optionally, commit your progress in source control.

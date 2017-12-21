@@ -21,17 +21,6 @@ class TasksTableViewController: UITableViewController {
         super.viewDidLoad()
         setupUI()
         setupRealm()
-        
-        // if the tssk list is empty, make a new task so the user sees something on launch.
-        if (items?.count == 0 ) {
-            try! realm.write {
-                let values =  ["text": "My First Task"]
-                let newTask = realm.create(Task.self, value: values)
-                realm.add(newTask) // add the new tasks
-                self.currentTaskList?.items.append(newTask) // and add it to our default list
-            } // of write
-        } // of empty items check
-        
     } // of viewDidLoad
     
     func setupUI() {
@@ -70,15 +59,19 @@ class TasksTableViewController: UITableViewController {
                 let initialValues = ["id": NSUUID().uuidString, "text": "My First Task List"]
                 let newTaskList = realm.create(TaskList.self, value: initialValues)
                 self.currentTaskList = newTaskList
+                
+                let values =  ["text": "My First Task"]
+                let newTask = realm.create(Task.self, value: values)
+                realm.add(newTask) // add the new tasks
+                self.currentTaskList?.items.append(newTask) // and add it to our default list
             }
         }
         
-        
         // Now, get all of our tasks, if any.  On return, we'll check to see if the list is empty
         // and make a prototype 1st task for the user so they're not looking ast a blank screen.
-        items = self.currentTaskList?.items // NB: this will return an empty list if there are no tasks
+        self.items = self.currentTaskList?.items // NB: this will return an empty list if there are no tasks
         
-        // and, finally, let's listen for changes to the task list object
+        // and, finally, let's listen for changes to the task items
         self.notificationToken = self.setupNotifications()
 
     }// of setupRealm
@@ -151,31 +144,29 @@ class TasksTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-         return self.currentTaskList?.items.count ?? 0
+         return self.items!.count
     }
     
-//    override func tableView(_ tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-//        return self.currentTaskList?.items.count ?? 0
-//    }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        let item = items![indexPath.row]
+        let item = self.items![indexPath.row]
         cell.textLabel?.text = item.text
         cell.textLabel?.alpha = item.completed ? 0.5 : 1
+        print("working on cell for row: \(indexPath.row), text is \"\(item.text)\"")
         return cell
     }
     
     override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        try! items?.realm?.write {
-            items?.move(from: sourceIndexPath.row, to: destinationIndexPath.row)
+        try! self.items?.realm?.write {
+            self.items?.move(from: sourceIndexPath.row, to: destinationIndexPath.row)
         }
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             try! realm.write {
-                let item = items?[indexPath.row]
+                let item = self.items?[indexPath.row]
                 realm.delete(item!)
             }
         }
@@ -193,7 +184,7 @@ class TasksTableViewController: UITableViewController {
                 let completedCount = items!.filter("completed = true").count
                 destinationIndexPath = IndexPath(row: items!.count - completedCount - 1, section: 0)
             }
-            items!.move(from: indexPath.row, to: destinationIndexPath.row)
+            self.items!.move(from: indexPath.row, to: destinationIndexPath.row)
         }
     }
     

@@ -2,19 +2,21 @@
 //  ConstantsAndModels.swift
 //  MultiUserRealmTasksTutorial
 //
-//  Created by David Spector on 6/6/17.
-//  Copyright © 2017 Realm. All rights reserved.
+//  Created by Ian Ward on 12/20/17.
+//  Copyright © 2017 Ian Ward. All rights reserved.
 //
 
 import Foundation
 import RealmSwift
 
+
+
 struct Constants {
     // segue names
     static let      kLoginToMainView                = "loginToTasksViewSegue"
     static let      kExitToLoginViewSegue           = "tasksToLoginViewSegue"
-
-
+    
+    
     // the host that will do the synch - if oure using the Mac dev kit you probably want this to be localhost/127.0.0.1
     // if you are using the Professional or Enterprise Editions, then this will be a host on the Internet
     static let defaultSyncHost                      = "127.0.0.1"
@@ -28,13 +30,13 @@ struct Constants {
     
     // Note: When we say Realm file we mean literally the entire collection of models/schemas inside that Realm...
     // So we need to be very clear what models that are represented by a given Realm.  For example:
-
+    
     // this is a realm where we can store profile info - not covered in the main line of this tutorial
     static let commonRealmURL                       = URL(string: "realm://\(defaultSyncHost):9080/CommonRealm")!
     
     // Note: If Swift supported C-style macros, we could simply define the configuration for the tasks Realm like this:
     //
-    //static let commonRealmConfig    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: commonRealmURL),objectTypes: [Person.self])
+    static let commonRealmConfig                    = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: commonRealmURL),objectTypes: [Person.self])
     // However the key bit of information the Realm config needs is which user (e.g., SyncUser) it's being configured with.  As a static
     // this would get set only once at app launch time -- so if your initial user logs out and someone else tries to log in, the
     // configuration would still be using the SyncUser.currrent value obtained at launch. So, instead we'll use the function below which
@@ -52,15 +54,15 @@ func commonRealmConfig(user: SyncUser) -> Realm.Configuration  {
 }
 
 func tasksRealmConfig(user: SyncUser) -> Realm.Configuration  {
-    let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: Constants.commonRealmURL), objectTypes: [TaskList.self, Task.self])
+    let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: SyncUser.current!, realmURL: Constants.tasksRealmURL), objectTypes: [TaskList.self, Task.self])
     return config
 }
 
-
+// MARK: Model
 
 final class TaskList: Object {
-    dynamic var text = ""
-    dynamic var id = ""
+    @objc dynamic var text = ""
+    @objc dynamic var id = ""
     let items = List<Task>()
     
     override static func primaryKey() -> String? {
@@ -69,18 +71,17 @@ final class TaskList: Object {
 }
 
 final class Task: Object {
-    dynamic var text = ""
-    dynamic var completed = false
+    @objc dynamic var text = ""
+    @objc dynamic var completed = false
 }
 
-
 class Person : Object {
-    dynamic var id = ""
-    dynamic var creationDate: Date?
-    dynamic var lastUpdated: Date?
+    @objc dynamic var id = ""
+    @objc dynamic var creationDate: Date?
+    @objc dynamic var lastUpdated: Date?
     
-    dynamic var lastName = ""
-    dynamic var firstName = ""
+    @objc dynamic var lastName = ""
+    @objc dynamic var firstName = ""
     
     
     override static func primaryKey() -> String? {

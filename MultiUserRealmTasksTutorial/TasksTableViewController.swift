@@ -28,7 +28,7 @@ class TasksTableViewController: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
         // we don't have a UINavigationController so let's add a hand-constructed UINavBar
-        let screenSize: CGRect = UIScreen.main.bounds
+        //let screenSize: CGRect = UIScreen.main.bounds
         //let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: 44))
         //let navItem = UINavigationItem(title: "")
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))

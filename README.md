@@ -45,9 +45,9 @@ Full details are available via the Cocopods site, but the simplest instructions 
 
 Initialize a new Cocoapods Podfile with pod init A new file called Podfile will be created.
 
-Edit the Podfile, find the the comment line that reads:
+Edit the Podfile, find the the comment line that reads: `# Pods for MultiUserRealmTasksTutorial` 
 
-# Pods for MultiUserRealmTasksTutorial And add the following after this line:
+And add the following after this line:
 ```
 pod 'RealmSwift'
 pod 'RealmLoginKit'

@@ -1,3 +1,7 @@
+# DEPRECATED
+With the introduction of [MongoDB Realm](https://www.mongodb.com/realm), this project is **deprecated**. Please use [MongoDB Realm Cloud](https://docs.mongodb.com/realm/).
+
+-----
 ### Building Your First Multi-User Realm Mobile Platform iOS App
 
 This tutorial will guide you through writing an iOS app using Realm Swift to sync with the RealmTasks demo apps.
